@@ -1,0 +1,7 @@
+FilePath:DeviceID:"C:":[0..1]
+FilePath:Separator:"\":[2..2]
+FilePath:FSEntryName:"Windows":[3..9]
+FilePath:Separator:"\":[10..10]
+FilePath:FSEntryName:"System32":[11..18]
+FilePath:Separator:"\":[19..19]
+FilePath:FSEntryName:"calc.exe":[20..27]

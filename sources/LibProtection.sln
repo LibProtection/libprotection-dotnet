@@ -1,0 +1,68 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2005
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibProtection.Injections", "LibProtection.Injections\LibProtection.Injections.csproj", "{20BBA706-BA92-4B83-85D5-30E91C71BA13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibProtection.Injections.UnitTests", "LibProtection.Injections.UnitTests\LibProtection.Injections.UnitTests.csproj", "{F60B0DFF-E147-4BA5-BAAD-4FED5F79868A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4B89CA8F-40D7-4F60-96C7-77D12ED3878E}"
+	ProjectSection(SolutionItems) = preProject
+		LibProtection.snk = LibProtection.snk
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibProtection.Injections.FuncTests", "LibProtection.Injections.FuncTests\LibProtection.Injections.FuncTests.csproj", "{2F8064E2-D296-4A55-B2E6-B36D9367D902}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "LibProtection.TestSite", "LibProtection.TestSite\", "{5B91F7C5-6A62-4BC4-BEA9-6809BF7C032B}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.6.1"
+		ProjectReferences = "{20bba706-ba92-4b83-85d5-30e91c71ba13}|LibProtection.Injections.dll;"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_60991"
+		Debug.AspNetCompiler.PhysicalPath = "LibProtection.TestSite\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_60991\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_60991"
+		Release.AspNetCompiler.PhysicalPath = "LibProtection.TestSite\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_60991\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "60991"
+		SlnRelativePath = "LibProtection.TestSite\"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{20BBA706-BA92-4B83-85D5-30E91C71BA13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20BBA706-BA92-4B83-85D5-30E91C71BA13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20BBA706-BA92-4B83-85D5-30E91C71BA13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20BBA706-BA92-4B83-85D5-30E91C71BA13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F60B0DFF-E147-4BA5-BAAD-4FED5F79868A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F60B0DFF-E147-4BA5-BAAD-4FED5F79868A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F60B0DFF-E147-4BA5-BAAD-4FED5F79868A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F60B0DFF-E147-4BA5-BAAD-4FED5F79868A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F8064E2-D296-4A55-B2E6-B36D9367D902}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F8064E2-D296-4A55-B2E6-B36D9367D902}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F8064E2-D296-4A55-B2E6-B36D9367D902}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F8064E2-D296-4A55-B2E6-B36D9367D902}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B91F7C5-6A62-4BC4-BEA9-6809BF7C032B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B91F7C5-6A62-4BC4-BEA9-6809BF7C032B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B91F7C5-6A62-4BC4-BEA9-6809BF7C032B}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B91F7C5-6A62-4BC4-BEA9-6809BF7C032B}.Release|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B09DA113-A177-4529-B2DD-BC5D62AE635E}
+	EndGlobalSection
+EndGlobal
