@@ -1,0 +1,15 @@
+<?xml version='1.0'?>
+<bookstore xmlns="urn:newbooks-schema">
+  <book>
+    <title>The Handmaid's Tale</title>
+    <author>Atwood</author>
+  </book>
+  <book>
+    <title>The Poisonwood Bible</title>
+    <author>Kingsolver</author>
+  </book>
+  <book>
+    <title>The Bean Trees</title>
+    <author>Kingsolver</author>
+  </book>
+</bookstore>

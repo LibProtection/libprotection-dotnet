@@ -1,0 +1,4 @@
+[submodule "submodules/libprotection-grammars"]
+	path = submodules/libprotection-grammars
+	url = git@github.com:PositiveTechnologies/libprotection-grammars.git
+	branch = dev
