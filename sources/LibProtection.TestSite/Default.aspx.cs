@@ -5,6 +5,9 @@ using System.Web.UI;
 using LibProtection.Injections;
 using System.Configuration;
 using System.Linq;
+using System.Xml;
+using System.Data;
+using System.Data.SqlClient;
 
 namespace LibProtection.TestSite
 {
@@ -60,18 +63,18 @@ namespace LibProtection.TestSite
         {
             if (string.IsNullOrWhiteSpace(path)) { return string.Empty; }
 
-            var doc = new System.Xml.XmlDocument();
+            var doc = new XmlDocument();
             doc.Load(System.IO.Path.Combine(HttpRuntime.AppDomainAppPath, "xmldocument.xml"));
             var root = doc.DocumentElement;
 
             // Add the namespace.
-            var nsmgr = new System.Xml.XmlNamespaceManager(doc.NameTable);
+            var nsmgr = new XmlNamespaceManager(doc.NameTable);
             nsmgr.AddNamespace("bk", "urn:newbooks-schema");
 
             var nodes = root.SelectNodes(path, nsmgr);
 
             var builder = new System.Text.StringBuilder();
-            foreach (System.Xml.XmlNode row in nodes)
+            foreach (XmlNode row in nodes)
             {
 
                 builder.AppendFormat("<br>{0} - {1}", row["title"].InnerText, row["author"].InnerText);
@@ -83,15 +86,14 @@ namespace LibProtection.TestSite
         {
             if (string.IsNullOrWhiteSpace(xml)) { return string.Empty; }
 
-            var settings = new System.Xml.XmlReaderSettings();
-            settings.DtdProcessing = System.Xml.DtdProcessing.Parse;
-            var xmlDoc = new System.Xml.XmlDocument();
-
+            var settings = new XmlReaderSettings();
+            settings.DtdProcessing = DtdProcessing.Parse;
+            var xmlDoc = new XmlDocument();
+            xmlDoc.XmlResolver = new XmlUrlResolver();
             var xmlBytes = Encoding.ASCII.GetBytes(xml);
 
-            var doc = new System.Xml.XmlDocument();
-            doc.Load(System.Xml.XmlReader.Create(new System.IO.MemoryStream(xmlBytes), settings));
-            return doc.LastChild.OuterXml;
+            xmlDoc.Load(XmlReader.Create(new System.IO.MemoryStream(xmlBytes), settings));
+            return xmlDoc.LastChild.OuterXml;
         }
 
         protected static string PathTagBuilder(string path)
@@ -107,9 +109,9 @@ namespace LibProtection.TestSite
             if (string.IsNullOrWhiteSpace(request)) { return string.Empty; }
             var result = string.Empty;
 
-            using (var connection = new System.Data.SqlClient.SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True"))
+            using (var connection = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True"))
             {
-                using (var adapter = new System.Data.SqlClient.SqlDataAdapter())
+                using (var adapter = new SqlDataAdapter())
                 {
                     connection.Open();
                     using (var command = connection.CreateCommand())
@@ -117,14 +119,13 @@ namespace LibProtection.TestSite
                         command.CommandText = request;
                         adapter.SelectCommand = command;
 
-                        using (var dataSet = new System.Data.DataSet())
+                        using (var dataSet = new DataSet())
                         {
                             adapter.Fill(dataSet);
 
-                            var builder = new System.Text.StringBuilder();
-                            foreach (System.Data.DataRow row in dataSet.Tables[0].Rows)
+                            var builder = new StringBuilder();
+                            foreach (DataRow row in dataSet.Tables[0].Rows)
                             {
-
                                 builder.AppendFormat("<br>{0} - {1}", row["Id"], row["myColumn"]);
                             }
                             result = builder.ToString();
