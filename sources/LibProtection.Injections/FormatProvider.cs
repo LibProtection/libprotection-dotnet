@@ -40,7 +40,7 @@ namespace LibProtection.Injections
         public static bool TryFormat<T>(string format, out string formatted, object[] args)
             where T : LanguageProvider
         {
-            var cacheItem = new CacheFormatItem
+            var keyItem = new CacheFormatItem
             {
                 Format = format,
                 Args = args,
@@ -49,19 +49,19 @@ namespace LibProtection.Injections
             var customCache = GenericCacheHolder<T>.customCache;
             if (customCache != null)
             {
-                if(customCache.Get(cacheItem, out var result))
+                if(customCache.Get(keyItem, out var formatSuccess, out var formatResult))
                 {
-                    formatted = result;
-                    return true;
+                    formatted = formatResult;
+                    return formatSuccess;
                 }
 
-                var (success, resultValue) = TryFormatInternal<T>(cacheItem);
-                customCache.Add(cacheItem, resultValue);
-                formatted = resultValue;
-                return success;
+                (formatSuccess, formatResult) = TryFormatInternal<T>(keyItem);
+                customCache.Add(keyItem, formatSuccess, formatResult);
+                formatted = formatResult;
+                return formatSuccess;
             }
 
-            var (cachedSuccess, cachedResultValue) = GenericCacheHolder<T>.Instance.Get(cacheItem, TryFormatInternal<T>);
+            var (cachedSuccess, cachedResultValue) = GenericCacheHolder<T>.Instance.Get(keyItem, TryFormatInternal<T>);
 
             formatted = cachedResultValue;
             return cachedSuccess;

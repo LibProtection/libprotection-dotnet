@@ -2,7 +2,7 @@
 {
     public interface ICustomCache
     {
-        bool Add(CacheFormatItem formatItem, string result);
-        bool Get(CacheFormatItem formatItem, out string result);
+        bool Add(CacheFormatItem formatItem, bool formatSuccess, string formatResult);
+        bool Get(CacheFormatItem formatItem, out bool formatSuccess, out string resultValue);
     }
 }
