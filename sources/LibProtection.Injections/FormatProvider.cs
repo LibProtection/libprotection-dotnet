@@ -16,16 +16,28 @@ namespace LibProtection.Injections
             _formatter = new Formatter(complementaryChar);
         }
 
-        private static class GenericCacheHolder<T>
+        private static class GenericCacheHolder<T> where T : LanguageProvider
         {
-            public static RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)> Instance
+            public static volatile RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)> Instance
                 = new RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)>(1024);
 
             public static volatile ICustomCache customCache = null;
         }
 
-        public static void SetCustomCache<T>(ICustomCache customCache)
+        public static void SetCustomCache<T>(ICustomCache customCache) where T : LanguageProvider
             => GenericCacheHolder<T>.customCache = customCache;
+
+        public static void SetDefaultCacheSize<T>(int cacheTableSize) where T : LanguageProvider
+        {
+            if(cacheTableSize < 0)
+            {
+                throw new ArgumentException($"{nameof(cacheTableSize)} argument of {nameof(SetDefaultCacheSize)} method should be greater or equal to zero!");
+            }
+
+            GenericCacheHolder<T>.Instance = (cacheTableSize != 0)
+                ? GenericCacheHolder<T>.Instance = new RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)>(cacheTableSize)
+                : null;
+        }
 
         public object GetFormat(Type formatType)
         {
@@ -61,10 +73,14 @@ namespace LibProtection.Injections
                 return formatSuccess;
             }
 
-            var (cachedSuccess, cachedResultValue) = GenericCacheHolder<T>.Instance.Get(keyItem, TryFormatInternal<T>);
+            var lruCache = GenericCacheHolder<T>.Instance;
 
-            formatted = cachedResultValue;
-            return cachedSuccess;
+            var (success, resultValue) = (lruCache != null)
+                ? GenericCacheHolder<T>.Instance.Get(keyItem, TryFormatInternal<T>)
+                : TryFormatInternal<T>(keyItem);
+
+            formatted = resultValue;
+            return success;
         }
 
         private static (bool Success, string ResultValue) TryFormatInternal<T>(CacheFormatItem formatItem)

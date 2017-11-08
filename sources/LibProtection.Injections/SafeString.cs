@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibProtection.Injections.Caching;
+using System;
 
 namespace LibProtection.Injections
 {
@@ -6,6 +7,12 @@ namespace LibProtection.Injections
 
     public static class SafeString<T> where T : LanguageProvider
     {
+        public static void SetCustomCache(ICustomCache customCache)
+            => FormatProvider.SetCustomCache<T>(customCache);
+
+        public static void SetDefaultCacheSize(int cacheTableSize)
+            => FormatProvider.SetDefaultCacheSize<T>(cacheTableSize);
+
         public static string Format(FormattableString formattable) 
         {
             if (TryFormat(formattable, out var formatted))
