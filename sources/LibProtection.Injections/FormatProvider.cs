@@ -16,26 +16,28 @@ namespace LibProtection.Injections
             _formatter = new Formatter(complementaryChar);
         }
 
-        private static class GenericCacheHolder<T> where T : LanguageProvider
+        private static class GenericHolder<T> where T : LanguageProvider
         {
             public static volatile RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)> Instance
                 = new RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)>(1024);
 
             public static volatile ICustomCache customCache = null;
+
+            public static Func<CacheFormatItem, (bool Success, string ResultValue)> TryFormatDelegate { get; } = TryFormatInternal<T>;
         }
 
         public static void SetCustomCache<T>(ICustomCache customCache) where T : LanguageProvider
-            => GenericCacheHolder<T>.customCache = customCache;
+            => GenericHolder<T>.customCache = customCache;
 
         public static void SetDefaultCacheSize<T>(int cacheTableSize) where T : LanguageProvider
         {
-            if(cacheTableSize < 0)
+            if (cacheTableSize < 0)
             {
                 throw new ArgumentException($"{nameof(cacheTableSize)} argument of {nameof(SetDefaultCacheSize)} method should be greater or equal to zero!");
             }
 
-            GenericCacheHolder<T>.Instance = (cacheTableSize != 0)
-                ? GenericCacheHolder<T>.Instance = new RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)>(cacheTableSize)
+            GenericHolder<T>.Instance = (cacheTableSize != 0)
+                ? GenericHolder<T>.Instance = new RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)>(cacheTableSize)
                 : null;
         }
 
@@ -58,10 +60,10 @@ namespace LibProtection.Injections
                 Args = args,
             };
 
-            var customCache = GenericCacheHolder<T>.customCache;
+            var customCache = GenericHolder<T>.customCache;
             if (customCache != null)
             {
-                if(customCache.Get(keyItem, out var formatSuccess, out var formatResult))
+                if (customCache.Get(keyItem, out var formatSuccess, out var formatResult))
                 {
                     formatted = formatResult;
                     return formatSuccess;
@@ -73,10 +75,10 @@ namespace LibProtection.Injections
                 return formatSuccess;
             }
 
-            var lruCache = GenericCacheHolder<T>.Instance;
+            var lruCache = GenericHolder<T>.Instance;
 
             var (success, resultValue) = (lruCache != null)
-                ? GenericCacheHolder<T>.Instance.Get(keyItem, TryFormatInternal<T>)
+                ? GenericHolder<T>.Instance.Get(keyItem, GenericHolder<T>.TryFormatDelegate)
                 : TryFormatInternal<T>(keyItem);
 
             formatted = resultValue;
