@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Caching\CacheFormatItem.cs" />
+    <Compile Include="Caching\HashTableCache.cs" />
     <Compile Include="Fragment.cs" />
     <Compile Include="Caching\ICustomCache.cs" />
     <Compile Include="Languages\AntlrLanguageProvider.cs" />

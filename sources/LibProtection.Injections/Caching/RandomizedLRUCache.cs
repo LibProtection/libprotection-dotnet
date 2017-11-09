@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 
-internal class RandomizedLRUCache<TKey, TValue>
+internal sealed class RandomizedLRUCache<TKey, TValue>
 {
     private class CacheRecord
     {
