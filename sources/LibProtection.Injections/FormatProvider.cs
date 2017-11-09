@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibProtection.Injections.Caching;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -15,6 +16,31 @@ namespace LibProtection.Injections
             _formatter = new Formatter(complementaryChar);
         }
 
+        private static class GenericHolder<T> where T : LanguageProvider
+        {
+            public static volatile RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)> Instance
+                = new RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)>(1024);
+
+            public static volatile ICustomCache customCache = null;
+
+            public static Func<CacheFormatItem, (bool Success, string ResultValue)> TryFormatDelegate { get; } = TryFormatInternal<T>;
+        }
+
+        public static void SetCustomCache<T>(ICustomCache customCache) where T : LanguageProvider
+            => GenericHolder<T>.customCache = customCache;
+
+        public static void SetDefaultCacheSize<T>(int cacheTableSize) where T : LanguageProvider
+        {
+            if (cacheTableSize < 0)
+            {
+                throw new ArgumentException($"{nameof(cacheTableSize)} argument of {nameof(SetDefaultCacheSize)} method should be greater or equal to zero!");
+            }
+
+            GenericHolder<T>.Instance = (cacheTableSize != 0)
+                ? GenericHolder<T>.Instance = new RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)>(cacheTableSize)
+                : null;
+        }
+
         public object GetFormat(Type formatType)
         {
             return formatType == typeof(ICustomFormatter) ? _formatter : null;
@@ -28,6 +54,43 @@ namespace LibProtection.Injections
         public static bool TryFormat<T>(string format, out string formatted, object[] args)
             where T : LanguageProvider
         {
+            var keyItem = new CacheFormatItem
+            {
+                Format = format,
+                Args = args,
+            };
+
+            var customCache = GenericHolder<T>.customCache;
+            if (customCache != null)
+            {
+                if (customCache.Get(keyItem, out var formatSuccess, out var formatResult))
+                {
+                    formatted = formatResult;
+                    return formatSuccess;
+                }
+
+                (formatSuccess, formatResult) = TryFormatInternal<T>(keyItem);
+                customCache.Add(keyItem, formatSuccess, formatResult);
+                formatted = formatResult;
+                return formatSuccess;
+            }
+
+            var lruCache = GenericHolder<T>.Instance;
+
+            var (success, resultValue) = (lruCache != null)
+                ? GenericHolder<T>.Instance.Get(keyItem, GenericHolder<T>.TryFormatDelegate)
+                : TryFormatInternal<T>(keyItem);
+
+            formatted = resultValue;
+            return success;
+        }
+
+        private static (bool Success, string ResultValue) TryFormatInternal<T>(CacheFormatItem formatItem)
+            where T : LanguageProvider
+        {
+            var format = formatItem.Format;
+            var args = formatItem.Args;
+
             var complementaryChar = string.Concat(format, string.Concat(args)).GetComplementaryChar();
             var formatProvider = new FormatProvider(complementaryChar);
             var formattedBuilder = new StringBuilder(string.Format(formatProvider, format, args));
@@ -63,15 +126,15 @@ namespace LibProtection.Injections
             var rawFormatted = formattedBuilder.ToString();
             Debug.Assert(!rawFormatted.Contains(complementaryChar.ToString()));
 
-            if (LanguageService<T>.TrySanitize(rawFormatted, taintedRanges, out formatted, out var sanitizedRanges))
+            if (LanguageService<T>.TrySanitize(rawFormatted, taintedRanges, out var formatted, out var sanitizedRanges))
             {
                 if (LanguageService<T>.Validate(formatted, sanitizedRanges))
                 {
-                    return true;
+                    return (true, formatted);
                 }
             }
 
-            return false;
+            return (false, null);
         }
     }
 }

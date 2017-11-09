@@ -52,10 +52,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Caching\CacheFormatItem.cs" />
+    <Compile Include="Caching\HashTableCache.cs" />
     <Compile Include="Fragment.cs" />
+    <Compile Include="Caching\ICustomCache.cs" />
     <Compile Include="Languages\AntlrLanguageProvider.cs" />
     <Compile Include="Languages\IslandDto.cs" />
     <Compile Include="Languages\RegexLanguageProvider.cs" />
+    <Compile Include="Caching\RandomizedLRUCache.cs" />
     <Compile Include="Single.cs" />
     <Compile Include="Languages\Html\Html.cs" />
     <Compile Include="Languages\Html\HtmlTokenType.cs" />
