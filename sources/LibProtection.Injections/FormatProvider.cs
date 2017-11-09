@@ -19,7 +19,7 @@ namespace LibProtection.Injections
         private static class GenericCacheHolder<T> where T : LanguageProvider
         {
             public static volatile RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)> Instance
-                = new RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)>(TryFormatInternal<T>, 1024);
+                = new RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)>(1024);
 
             public static volatile ICustomCache customCache = null;
         }
@@ -35,7 +35,7 @@ namespace LibProtection.Injections
             }
 
             GenericCacheHolder<T>.Instance = (cacheTableSize != 0)
-                ? GenericCacheHolder<T>.Instance = new RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)>(TryFormatInternal<T> , cacheTableSize)
+                ? GenericCacheHolder<T>.Instance = new RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)>(cacheTableSize)
                 : null;
         }
 
@@ -76,7 +76,7 @@ namespace LibProtection.Injections
             var lruCache = GenericCacheHolder<T>.Instance;
 
             var (success, resultValue) = (lruCache != null)
-                ? GenericCacheHolder<T>.Instance.Get(keyItem)
+                ? GenericCacheHolder<T>.Instance.Get(keyItem, TryFormatInternal<T>)
                 : TryFormatInternal<T>(keyItem);
 
             formatted = resultValue;

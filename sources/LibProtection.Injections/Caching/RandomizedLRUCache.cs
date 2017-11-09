@@ -19,20 +19,21 @@ internal class RandomizedLRUCache<TKey, TValue>
 
     private readonly ConcurrentDictionary<TKey, CacheRecord> _cache;
     private readonly CacheRecord[] _records;
-    private readonly Func<TKey, TValue> _valueFactory;
-    private readonly Func<TKey, CacheRecord> _recordFactory;
 
-    public RandomizedLRUCache(Func<TKey, TValue> factory, int capacity, IEqualityComparer<TKey> comparer = null)
+    public RandomizedLRUCache(int capacity, IEqualityComparer<TKey> comparer = null)
     {
         _cache = new ConcurrentDictionary<TKey, CacheRecord>(comparer ?? EqualityComparer<TKey>.Default);
         _records = new CacheRecord[capacity];
-        _valueFactory = factory;
-        _recordFactory = RecordFactory;
     }
 
-    public TValue Get(TKey key)
+    public TValue Get(TKey key, Func<TKey, TValue> factory)
     {
-        var record = _cache.GetOrAdd(key, _recordFactory);
+        if(!_cache.TryGetValue(key, out var record)){
+            record = _cache.GetOrAdd(
+                key, 
+                new CacheRecord { Key = key, Value = factory(key) });
+        }
+        
         var index = GetRandomIndex();
         var oldRecord = Interlocked.Exchange(ref _records[index], record);
 
@@ -51,9 +52,6 @@ internal class RandomizedLRUCache<TKey, TValue>
 
         return record.Value;
     }
-
-    private CacheRecord RecordFactory(TKey key) =>
-        new CacheRecord { Key = key, Value = _valueFactory(key) };
 
     private int GetRandomIndex()
     {
