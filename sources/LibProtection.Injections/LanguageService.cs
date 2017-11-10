@@ -6,11 +6,10 @@ namespace LibProtection.Injections
 {
     internal static class LanguageService<T> where T : LanguageProvider
     {
-        public static bool TrySanitize(string text, List<Range> taintedRanges, out string sanitizedText,
-            out List<Range> sanitizedRanges)
+        public static bool TrySanitize(string text, List<Range> taintedRanges, out string sanitizedText)
         {
             sanitizedText = null;
-            sanitizedRanges = new List<Range>();
+            var sanitizedRanges = new List<Range>();
             var languageProvider = Single<T>.Instance;
             var tokens = languageProvider.Tokenize(text);
             var sanitizedFragments = new Dictionary<Range, string>();
@@ -59,7 +58,7 @@ namespace LibProtection.Injections
             }
 
             sanitizedText = sanitizedBuilder.ToString();
-            return true;
+            return Validate(sanitizedText, sanitizedRanges);
         }
 
         public static bool Validate(string text, List<Range> ranges)

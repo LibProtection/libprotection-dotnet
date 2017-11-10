@@ -135,6 +135,19 @@ namespace LibProtection.Injections
             switch (tokenType)
             {
                 case UrlTokenType.PathEntry:
+                    var fragments = text.Split('/');
+
+                    for (var i = 0; i < fragments.Length; i++)
+                    {
+                        if (fragments[i] != string.Empty)
+                        {
+                            fragments[i] = HttpUtility.UrlEncode(fragments[i]);
+                        }
+                    }
+
+                    encoded = string.Join("/", fragments);
+                    return true;
+
                 case UrlTokenType.QueryEntry:
                 case UrlTokenType.Fragment:
                     encoded = HttpUtility.UrlEncode(text);
