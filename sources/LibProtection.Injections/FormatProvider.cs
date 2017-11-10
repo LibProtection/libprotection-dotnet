@@ -18,16 +18,18 @@ namespace LibProtection.Injections
 
         private static class GenericHolder<T> where T : LanguageProvider
         {
+            // ReSharper disable once StaticMemberInGenericType
             public static volatile RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)> Instance
                 = new RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)>(1024);
 
-            public static volatile ICustomCache customCache = null;
+            // ReSharper disable once StaticMemberInGenericType
+            public static volatile ICustomCache CustomCache;
 
             public static Func<CacheFormatItem, (bool Success, string ResultValue)> TryFormatDelegate { get; } = TryFormatInternal<T>;
         }
 
         public static void SetCustomCache<T>(ICustomCache customCache) where T : LanguageProvider
-            => GenericHolder<T>.customCache = customCache;
+            => GenericHolder<T>.CustomCache = customCache;
 
         public static void SetDefaultCacheSize<T>(int cacheTableSize) where T : LanguageProvider
         {
@@ -60,7 +62,7 @@ namespace LibProtection.Injections
                 Args = args,
             };
 
-            var customCache = GenericHolder<T>.customCache;
+            var customCache = GenericHolder<T>.CustomCache;
             if (customCache != null)
             {
                 if (customCache.Get(keyItem, out var formatSuccess, out var formatResult))
@@ -91,7 +93,7 @@ namespace LibProtection.Injections
             var format = formatItem.Format;
             var args = formatItem.Args;
 
-            var complementaryChar = string.Concat(format, string.Concat(args)).GetComplementaryChar();
+            var complementaryChar = format.GetComplementaryChar();
             var formatProvider = new FormatProvider(complementaryChar);
             var formattedBuilder = new StringBuilder(string.Format(formatProvider, format, args));
             var taintedRanges = new List<Range>();
@@ -123,15 +125,12 @@ namespace LibProtection.Injections
                 }
             }
 
-            var rawFormatted = formattedBuilder.ToString();
-            Debug.Assert(!rawFormatted.Contains(complementaryChar.ToString()));
+            var formatted = formattedBuilder.ToString();
+            Debug.Assert(!formatted.Contains(complementaryChar.ToString()));
 
-            if (LanguageService<T>.TrySanitize(rawFormatted, taintedRanges, out var formatted, out var sanitizedRanges))
+            if (LanguageService<T>.TrySanitize(formatted, taintedRanges, out var sanitized))
             {
-                if (LanguageService<T>.Validate(formatted, sanitizedRanges))
-                {
-                    return (true, formatted);
-                }
+                return (true, sanitized);
             }
 
             return (false, null);
