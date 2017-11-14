@@ -1,8 +1,4 @@
-if not exist "%TEMP%\nuget.exe" (
-    cmd /c "bitsadmin /transfer nuget_job /download /priority high https://dist.nuget.org/win-x86-commandline/latest/nuget.exe %TEMP%\nuget.exe"
-)
-
-"%TEMP%\nuget" restore LibProtection.sln
+"%~dp1..\tools\nuget\nuget.exe" restore LibProtection.sln
 
 set vs2017dir=%programfiles(x86)%\Microsoft Visual Studio\2017
 set msbuild="%vs2017dir%\Community\MSBuild\15.0\Bin\MSBuild.exe"
