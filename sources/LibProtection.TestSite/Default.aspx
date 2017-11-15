@@ -3,10 +3,7 @@
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 
     <% Response.AddHeader("X-XSS-Protection", "0"); %>
-
     <div>
-        <p style="text-align: center; font-size: 20px;">LibProtection Test Site</p>
-
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 options = $("div[class|=exampleElement]");
@@ -24,41 +21,73 @@
                 %>
 
                 <div id ="<%=example.Prefix %>" class="exampleElement" style="display: none">
-                    <div style="display: table; width:60%;">
-                        <div style="display: table-cell; vertical-align: middle;">
-                            <asp:Label runat="server" Text="Format: " />
-                            <%
-                                if (InputsAreDisabled)
-                                {%>
-                                    <label ID="<%= example.FormatId %>"><%: formatterValue %></label>
-                                <%}else{%>
-                                    <input type="text" value="<%: formatterValue %>" ID="<%= example.FormatId %>" />
-                                <%}%>
+                    <div style="width:100%">
+                        <div style="margin-top: 20px">
+                            <h5><asp:Label runat="server" Text="Operation:" /></h5>
+                            <%= example.Operation %>
                         </div>
-                        <div style="display: table-cell; vertical-align: middle;">
-                            <asp:Label runat="server" Text="Parameter: " />
-                            <input type="text" value="<%: parameterValue %>" ID="<%= example.ParameterId %>" />
+                        <div style="display: table; width: 100%; margin-top: 20px">
+                            <div style="padding-right: 10px; display: table-cell">
+                                <h5><asp:Label runat="server" Text="Format string: " /></h5>
+                                <%
+                                    if (InputsAreDisabled)
+                                    {%>
+                                        <label ID="<%= example.FormatId %>"><%: formatterValue %></label>
+                                    <%}else{%>
+                                        <input class="form-control" type="text" value="<%: formatterValue %>" ID="<%= example.FormatId %>" />
+                                    <%}%>
+                            </div>
+                            <div style="padding-left: 10px; display: table-cell">
+                                <h5><asp:Label runat="server" Text="Arguments (one per line):" /></h5>
+                                <textarea class="form-control" rows="5" ID="<%= example.ParameterId %>"><%: parameterValue %></textarea>
+                            </div>
                         </div>
-                        <div style="display: table-cell; vertical-align: middle;">
-                            <input type="button" id="<%= example.ButtonId %>" value="Proceed!" />
+                        <div style="text-align: right; margin-top: 20px">
+                            <input style="width: 160px; display: inline-block" class="form-control" type="button" id="<%= example.ButtonId %>" value="Try format" />
                         </div>
-
                     </div>
-                    <br />
-
-                    <% var results = GetResultsFor(example); %>
-                    <asp:Label runat="server" Text="Format result: " />
-                    <%: results.FormatResult %>
-                    <br />
-                    <asp:Label runat="server" Text="Operation result: " />
-                    <%= results.OperationResult %>
-
+                    <% try
+                       {
+                           if (Request.Params[example.ParameterParam] != null || Request.Params[example.FormatParam] != null)
+                           { %>
+                                <div style="margin-top: 20px">
+                                    <% var results = GetResultsFor(example); %>
+                                    <h5>Format result:</h5>
+                                    <%: results.FormatResult %>
+                                </div>
+                                <div style="margin-top: 20px">
+                                    <h5>Operation result:</h5>
+                                    <%= string.IsNullOrEmpty(results.OperationResult) ?
+                                            "<span class=\"text-warning\">None</span>" :
+                                            $"<span class=\"text-success\">{results.OperationResult}</span>" %>
+                                </div>
+                    <%     }
+                       }
+                       catch (LibProtection.Injections.AttackDetectedException e)
+                       {
+                    %>
+                        <div class="alert alert-dismissible alert-danger">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <strong>Attack detected!</strong>
+                        </div>                    
+                    <%
+                       }
+                       catch (Exception e)
+                       {
+                    %>
+                        <div class="alert alert-dismissible alert-warning">
+                            <button type="button" class="close" data-dismiss="alert">&times;</button>
+                            <strong>Exception occured: <%= e.Message %></strong>
+                        </div>
+                    <%
+                       }
+                    %>
                     <script>
                         <%= example.ButtonId %>.onclick = function () {
                             <%if (InputsAreDisabled) {%>
-                                var formatValue = <%=example.FormatId%>.textContent;
+                            var formatValue = <%=example.FormatId%>.textContent;
                             <%}else{%>
-                                var formatValue = <%=example.FormatId%>.value;
+                            var formatValue = <%=example.FormatId%>.value;
                             <%}%>
                             window.location = "Default.aspx?<%=example.FormatParam%>=" + encodeURIComponent(formatValue) + "&<%=example.ParameterParam%>=" + encodeURIComponent(<%=example.ParameterId%>.value);
                         }

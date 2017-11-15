@@ -27,6 +27,7 @@ namespace LibProtection.TestSite
 
         protected struct Example
         {
+            public string Operation { get; set; }
             public Func<string, string[], string> FormatFunc { get; set; }
             public string Prefix { get; set; }
             public string Formatter { get; set; }
@@ -40,23 +41,21 @@ namespace LibProtection.TestSite
             public string ParameterParam => $"{Prefix}Parameter";
         }
 
-        private const string scriptVector = "<script>alert(0)</script>";
-
         protected static Example[] Examples =
         {
-                    new Example {FormatFunc = FormatHelper<Html>, Prefix="html", Formatter="<b>{0}</b>", Replacer=">" + scriptVector, TagBuilder = GetFormatTagBuilder("{0}") },
-                    new Example {FormatFunc = FormatHelper<JavaScript>, Prefix="javascript", Formatter="alert({0})", Replacer="\"/>Hello", TagBuilder = GetFormatTagBuilder("<label onclick={0}>ON CLICK</label>") },
-                    new Example {FormatFunc = FormatHelper<Sql>, Prefix="sql", Formatter="select * from myTable where myColumn = '{0}'", Replacer="' OR 1 = 1 --", TagBuilder = SqlRequestTagBuilder },
-                    new Example {FormatFunc = FormatHelper<Url>, Prefix="url", Formatter="./img/{0}", Replacer="../spanch.gif", TagBuilder = GetFormatTagBuilder("<img src=\"{0}\" />") },
-                    new Example {FormatFunc = FormatHelper<FilePath>, Prefix="filepath", Formatter=@".\files\{0}", Replacer=@"..\textFile.txt", TagBuilder = PathTagBuilder },
+                    new Example {Operation = "Write to HTTP response", FormatFunc = FormatHelper<Html>, Prefix="Html", Formatter="<a href='{0}' onclick='f(\"{1}\")'>{2}</a>", Replacer="\'onclick=\'alert(0)\r\n\")alert(\"0\r\n<script>alert(0)</script>", TagBuilder = GetFormatTagBuilder("{0}") },
+                    new Example {Operation = "Write to HTTP response", FormatFunc = FormatHelper<JavaScript>, Prefix="JavaScript", Formatter="alert('Hello: {0}')", Replacer="');alert('0", TagBuilder = GetFormatTagBuilder("<label onclick=\"{0}\">Click to execute</label>") },
+                    new Example {Operation = "Execute SQL query", FormatFunc = FormatHelper<Sql>, Prefix="Sql", Formatter="select * from myTable where myColumn = '{0}'", Replacer="' OR 1 = 1 -- ", TagBuilder = SqlRequestTagBuilder },
+                    new Example {Operation = "Write to HTTP response", FormatFunc = FormatHelper<Url>, Prefix="Url", Formatter="./img/{0}", Replacer="../spanch.gif", TagBuilder = GetFormatTagBuilder("<img src=\"{0}\" />") },
+                    new Example {Operation = "Read local file", FormatFunc = FormatHelper<FilePath>, Prefix="FilePath", Formatter=@".\files\{0}", Replacer=@"..\textFile.txt", TagBuilder = PathTagBuilder },
                     //new Example {FormatFunc = FormatHelper<Xpath>, Prefix="xpath", Formatter=@"descendant::bk:book[bk:author='{0}']", Replacer="' or ''='", TagBuilder = XPathTagBuilder },
                     //new Example {FormatFunc = FormatHelper<Xml>, Prefix="xml", Formatter="<?xml version=\"1.0\"?>{0}", Replacer="<!DOCTYPE foo [<!ELEMENT foo ANY><!ENTITY xxe SYSTEM \"file:///textfile.txt\">]><foo>&xxe;</foo>", TagBuilder = XMLTagBuilder },
         };
 
         #region Builders
-        protected static string FormatHelper<T>(string format, string[] parameters) where T : LanguageProvider
+        protected static string FormatHelper<T>(string format, object[] parameters) where T : LanguageProvider
         {
-            return SafeString<T>.TryFormat(format, out var result, parameters) ? result : null;
+            return SafeString<T>.Format(format, parameters);
         }
 
         protected static string XPathTagBuilder(string path)
@@ -167,23 +166,11 @@ namespace LibProtection.TestSite
         protected (string FormatResult, string OperationResult) GetResultsFor(Example example)
         {
             var formatResult = example.FormatFunc(
-                Request.Params[example.FormatParam] ?? string.Empty,
-                (Request.Params[example.ParameterParam] ?? string.Empty).Split(',')
+                Request.Params[example.FormatParam],
+                Request.Params[example.ParameterParam].Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
             );
 
-            string operationResult;
-
-            if (formatResult != null)
-            {
-                operationResult = example.TagBuilder(formatResult);
-            }
-            else
-            {
-                formatResult = "Attack detected!";
-                operationResult = "Not executed.";
-            }
-
-            return (formatResult, operationResult);
+            return (formatResult, example.TagBuilder(formatResult));
         }
     }
 }
