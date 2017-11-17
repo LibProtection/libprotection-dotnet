@@ -1,4 +1,4 @@
-﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Site.master.cs" Inherits="LibProtection.TestSite.SiteMaster" %>
+﻿<%@ Master Language="C#" AutoEventWireup="true" Inherits="LibProtection.TestSite.SiteMaster" Codebehind="Site.master.cs" %>
 
 <!DOCTYPE html>
 
@@ -43,7 +43,7 @@
         </div>
         <div class="container">
             <div class="form-group">
-                <h5>Select language provider:</h5>
+                <h5>Language provider:</h5>
                 <select style="width:120px" class="form-control" id="grammarSelectorId"></select>
             </div>
             <asp:ContentPlaceHolder ID="MainContent" runat="server">
