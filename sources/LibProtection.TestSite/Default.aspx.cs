@@ -30,8 +30,8 @@ namespace LibProtection.TestSite
         {
             public string Operation { get; set; }
             public Func<string, string[], string> FormatFunc { get; set; }
-            public string Formatter { get; set; }
-            public string Replacer { get; set; }
+            public string Format { get; set; }
+            public string Parameters { get; set; }
             public Func<string, string> TagBuilder { get; set; }
         }
 
@@ -43,9 +43,9 @@ namespace LibProtection.TestSite
                 {
                     Operation = "Renders given HTML markup on the client side",
                     FormatFunc = FormatHelper<Html>,
-                    Formatter = "<a href='{0}' onclick='alert(\"{1}\");return false'>{2}</a>",
-                    Replacer = "Default.aspx\r\nHello from embedded JavaScript code!\r\nThis site's home page",
-                    TagBuilder = GetFormatTagBuilder("{0}")
+                    Format = "<a href='{0}' onclick='alert(\"{1}\");return false'>{2}</a>",
+                    Parameters = "Default.aspx\r\nHello from embedded JavaScript code!\r\nThis site's home page",
+                    TagBuilder = s => s
                 }
             },
             {
@@ -54,9 +54,9 @@ namespace LibProtection.TestSite
                 {
                     Operation = "Executes given JavaScript code on the client side",
                     FormatFunc = FormatHelper<JavaScript>,
-                    Formatter = "operationResult.innerText = '{0}';",
-                    Replacer = "Hello from internal JavaScript code!",
-                    TagBuilder = GetFormatTagBuilder("<script><!--\r\n{0}\r\n//--></script>")
+                    Format = "operationResult.innerText = '{0}';",
+                    Parameters = "Hello from internal JavaScript code!",
+                    TagBuilder = s => $"<script>\r\n{s}\r\n</script>"
                 }
             },
             {
@@ -65,8 +65,8 @@ namespace LibProtection.TestSite
                 {
                     Operation = "Executes given SQL query on the sever side and outputs its results",
                     FormatFunc = FormatHelper<Sql>,
-                    Formatter = "SELECT * FROM myTable WHERE myColumn = '{0}'",
-                    Replacer = "value1",
+                    Format = "SELECT * FROM myTable WHERE id = {0} AND myColumn = '{1}'",
+                    Parameters = "1\r\nvalue1",
                     TagBuilder = SqlRequestTagBuilder
                 }
             },
@@ -76,9 +76,9 @@ namespace LibProtection.TestSite
                 {
                     Operation = "Uses given URL on the client side to load and execute external JavaScript code",
                     FormatFunc = FormatHelper<Url>,
-                    Formatter = "{0}/{1}",
-                    Replacer = "Assets\r\njsFile.js",
-                    TagBuilder = GetFormatTagBuilder("<script src=\"{0}\"></script>")
+                    Format = "{0}/{1}",
+                    Parameters = "Assets\r\njsFile.js",
+                    TagBuilder = s => $"<script src=\"{s}\"></script>"
                 }
             },
             {
@@ -87,8 +87,8 @@ namespace LibProtection.TestSite
                 {
                     Operation = "Reads content of a given local file on the server side and outputs it",
                     FormatFunc = FormatHelper<FilePath>,
-                    Formatter = HostingEnvironment.MapPath(@"~\Assets\{0}"),
-                    Replacer = "textFile.txt",
+                    Format = HostingEnvironment.MapPath(@"~\Assets\{0}"),
+                    Parameters = "textFile.txt",
                     TagBuilder = PathTagBuilder
                 }
             },
@@ -97,11 +97,6 @@ namespace LibProtection.TestSite
         };
 
         #region Builders
-        protected static string FormatHelper<T>(string format, object[] parameters) where T : LanguageProvider
-        {
-            return SafeString<T>.Format(format, parameters);
-        }
-
         protected static string XPathTagBuilder(string path)
         {
             if (string.IsNullOrWhiteSpace(path)) { return string.Empty; }
@@ -180,7 +175,10 @@ namespace LibProtection.TestSite
             return result;
         }
 
-        protected static Func<string, string> GetFormatTagBuilder(string formatter) => (arg) => string.Format(formatter, arg);
+        protected static string FormatHelper<T>(string format, object[] parameters) where T : LanguageProvider
+        {
+            return SafeString<T>.Format(format, parameters);
+        }
         #endregion
 
         protected bool InputsAreDisabled

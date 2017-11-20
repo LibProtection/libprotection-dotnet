@@ -4,7 +4,11 @@
 
     <% 
         Response.AddHeader("X-XSS-Protection", "0");
-        var id = Request.Params["Id"] ?? Examples.Keys.First();
+        var id = Request.Params["Id"];
+        if (id == null || !Examples.ContainsKey(id))
+        {
+            id = Examples.Keys.First();
+        }
     %>
     <div>
         <script>
@@ -26,9 +30,12 @@
                             <strong>Unknown language provider: <%: id %></strong>
                         </div>
                     <%
-                    } else {
-                        var parameters = Request.Params["Parameters"] ?? example.Replacer;
-                        var format = Request.Params["Format"] ?? example.Formatter;
+                        } else {
+                            var parameters = Request.Params["Parameters"] ?? example.Parameters;
+
+                            var format = string.IsNullOrEmpty(Request.Params["Format"]) || InputsAreDisabled ?
+                                example.Format :
+                                Request.Params["Format"];
                     %>
 
                     <div style="width:100%">
@@ -39,13 +46,7 @@
                         <div style="display: table; width: 100%; margin-top: 20px">
                             <div style="padding-right: 10px; display: table-cell; width: 50%">
                                 <h5>Format string:</h5>
-                                <%
-                                    if (InputsAreDisabled)
-                                    {%>
-                                        <label ID="format"><%: format %></label>
-                                    <%}else{%>
-                                        <input class="form-control" type="text" value="<%: format %>" ID="format" />
-                                    <%}%>
+                                <input class="form-control" type="text" value="<%: format %>" ID="format" <%= InputsAreDisabled ? "disabled=\"disabled\"" : string.Empty %> />
                             </div>
                             <div style="padding-left: 10px; display: table-cell; width: 50%">
                                 <h5>Arguments <small class="text-muted">(one per line):</small></h5>
@@ -92,16 +93,15 @@
                        }
                     %>
                     <script>
-                        button.onclick = function () {
-                            <%if (InputsAreDisabled) {%>
-                            var formatValue = window.format.textContent;
-                            <%}else{%>
-                            var formatValue = window.format.value;
-                            <%}%>
-                            window.location =
-                                "Default.aspx?Id=" + encodeURIComponent("<%: id %>") +
-                                "&Format=" + encodeURIComponent(formatValue) +
-                                "&Parameters=" + encodeURIComponent(window.parameters.value);
+                        button.onclick = function() {
+                             window.location =
+                                 "Default.aspx?Id=" +
+                                 encodeURIComponent("<%: id %>") +
+                                 <% if (!InputsAreDisabled) { %>
+                                 "&Format=" +
+                                 encodeURIComponent(window.format.value) +
+                                 <%} %>
+                                 "&Parameters=" + encodeURIComponent(window.parameters.value);
                         }
                     </script>
                     <hr />
