@@ -12,28 +12,19 @@ namespace LibProtection.Injections
             var sanitizedRanges = new List<Range>();
             var languageProvider = Single<T>.Instance;
             var tokens = languageProvider.Tokenize(text);
-            var sanitizedFragments = new Dictionary<Range, string>();
+            var fragments = new Dictionary<Range, string>();
 
             // Try to sanitize all attacked text's fragments
 
             foreach (var tokensScope in GetTokensScopes(tokens, taintedRanges))
             {
-                if (tokensScope.Tokens.Count < 2)
-                {
-                    continue;
-                }
-
                 var range = tokensScope.Range;
                 var fragment = text.Substring(range);
 
-                if (languageProvider.TrySanitize(fragment, tokensScope.Tokens[0], out var sanitizedFragment))
-                {
-                    sanitizedFragments.Add(range, sanitizedFragment);
-                }
-                else
-                {
-                    return false;
-                }
+                fragments.Add(range,
+                    languageProvider.TrySanitize(fragment, tokensScope.Tokens[0], out var sanitizedFragment)
+                        ? sanitizedFragment
+                        : fragment);
             }
 
             // Replace all attacked text's fragments with corresponding sanitized values
@@ -41,19 +32,19 @@ namespace LibProtection.Injections
             var positionAtText = 0;
             var sanitizedBuilder = new StringBuilder();
 
-            foreach (var range in sanitizedFragments.Keys)
+            foreach (var range in fragments.Keys)
             {
                 var charsToAppend = range.LowerBound - positionAtText;
-                sanitizedBuilder.Append(text.Substring(positionAtText, charsToAppend));
+                sanitizedBuilder.Append(text, positionAtText, charsToAppend);
                 var lowerBound = sanitizedBuilder.Length;
-                sanitizedBuilder.Append(sanitizedFragments[range]);
+                sanitizedBuilder.Append(fragments[range]);
                 sanitizedRanges.Add(new Range(lowerBound, sanitizedBuilder.Length - 1));
                 positionAtText = range.UpperBound + 1;
             }
 
             if (positionAtText < text.Length)
             {
-                sanitizedBuilder.Append(text.Substring(positionAtText, text.Length - positionAtText));
+                sanitizedBuilder.Append(text, positionAtText, text.Length - positionAtText);
                 
             }
 
@@ -67,6 +58,7 @@ namespace LibProtection.Injections
             var tokens = languageProvider.Tokenize(text);
 
             var scopesCount = 0;
+            var allTrivial = true;
 
             foreach (var scope in GetTokensScopes(tokens, ranges))
             {
@@ -75,7 +67,8 @@ namespace LibProtection.Injections
 
                 // Fragmented injection
                 scopesCount++;
-                if (scopesCount > 1 && !scope.Tokens.All(token => token.IsSafe)) { return false; }
+                allTrivial &= scope.Tokens.All(token => token.IsTrivial);
+                if (scopesCount > 1 && !allTrivial) { return false; }
             }
 
             return true;

@@ -20,6 +20,8 @@ namespace LibProtection.Injections
             ResourceValue
         }
 
+        private const string LanguageNotSupportedTemplate = "{0} language is not currently supported";
+
         private Html() { }
 
         protected override Enum ConvertAntlrTokenType(int antlrTokenType)
@@ -71,14 +73,20 @@ namespace LibProtection.Injections
                             context = HtmlTokenizerContext.Insignificant;
                             if (htmlTokenType == HtmlTokenType.TagName)
                             {
-                                var htmlLoweredText = token.Text.ToLowerInvariant();
+                                var tokenLoweredText = token.Text.ToLowerInvariant();
 
-                                if (htmlLoweredText.StartsWith("on"))
+                                if (tokenLoweredText == "style")
+                                {
+                                    throw new LanguageNotSupportedException(string.Format(LanguageNotSupportedTemplate,
+                                        "CSS"));
+                                }
+
+                                if (tokenLoweredText.StartsWith("on"))
                                 {
                                     context = HtmlTokenizerContext.EventName;
                                 }
                                 else if (new[] { "href", "src", "manifest", "poster", "code", "codebase", "data" }
-                                    .Contains(htmlLoweredText))
+                                    .Contains(tokenLoweredText))
                                 {
                                     context = HtmlTokenizerContext.ResourceName;
                                 }
@@ -135,6 +143,11 @@ namespace LibProtection.Injections
 
                 default:
                     var htmlTokenType = (HtmlTokenType)htmlToken.Type;
+
+                    if (htmlTokenType == HtmlTokenType.StyleBody || htmlTokenType == HtmlTokenType.StyleShortBody)
+                    {
+                        throw new LanguageNotSupportedException(string.Format(LanguageNotSupportedTemplate, "CSS"));
+                    }
 
                     if (htmlTokenType == HtmlTokenType.ScriptBody || htmlTokenType == HtmlTokenType.ScriptShortBody)
                     {
@@ -209,10 +222,11 @@ namespace LibProtection.Injections
                     throw new ArgumentException($"Unsupported HTML island: {context}");
             }
 
-            return base.TrySanitize(text, context, out sanitized);
+            sanitized = null;
+            return false;
         }
 
-        protected override bool IsSafeToken(Enum type, string text)
+        protected override bool IsTrivial(Enum type, string text)
         {
             switch ((HtmlTokenType) type)
             {

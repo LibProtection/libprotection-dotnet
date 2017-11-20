@@ -7,24 +7,13 @@ namespace LibProtection.Injections
     {
         public abstract IEnumerable<Token> Tokenize(string text, int offset = 0);
 
-        public virtual bool TrySanitize(string text, Token context, out string sanitized)
-        {
-            sanitized = null;
-
-            if (IsSafeToken(context.Type, context.Text))
-            {
-                sanitized = context.Text;
-                return true;
-            }
-
-            return false;
-        }
+        public abstract bool TrySanitize(string text, Token context, out string sanitized);
 
         protected Token CreateToken(Enum type, int lowerBound, int upperBound, string text)
         {
-            return new Token(this, type, lowerBound, upperBound, text, IsSafeToken(type, text));
+            return new Token(this, type, lowerBound, upperBound, text, IsTrivial(type, text));
         }
 
-        protected abstract bool IsSafeToken(Enum type, string text);
+        protected abstract bool IsTrivial(Enum type, string text);
     }
 }

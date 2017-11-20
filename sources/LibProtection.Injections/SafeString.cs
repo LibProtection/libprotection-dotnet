@@ -3,8 +3,6 @@ using System;
 
 namespace LibProtection.Injections
 {
-    public class AttackDetectedException : Exception { }
-
     public static class SafeString<T> where T : LanguageProvider
     {
         public static void SetCustomCache(ICustomCache customCache)
