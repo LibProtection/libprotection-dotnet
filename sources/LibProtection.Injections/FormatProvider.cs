@@ -25,7 +25,8 @@ namespace LibProtection.Injections
             // ReSharper disable once StaticMemberInGenericType
             public static volatile ICustomCache CustomCache;
 
-            public static Func<CacheFormatItem, (bool Success, string ResultValue)> TryFormatDelegate { get; } = TryFormatInternal<T>;
+            public static Func<CacheFormatItem, (bool Success, string ResultValue)> TryFormatDelegate { get; } =
+                TryFormatInternal<T>;
         }
 
         public static void SetCustomCache<T>(ICustomCache customCache) where T : LanguageProvider
@@ -126,7 +127,6 @@ namespace LibProtection.Injections
             }
 
             var formatted = formattedBuilder.ToString();
-            Debug.Assert(!formatted.Contains(complementaryChar.ToString()));
 
             if (LanguageService<T>.TrySanitize(formatted, taintedRanges, out var sanitized))
             {

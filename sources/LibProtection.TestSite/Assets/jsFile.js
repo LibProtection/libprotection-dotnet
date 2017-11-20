@@ -1,0 +1,1 @@
+﻿operationResult.innerText = "Hello from external JavaScript code!";

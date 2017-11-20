@@ -41,7 +41,7 @@ namespace LibProtection.Injections
             return lexer;
         }
 
-        protected override bool IsSafeToken(Enum type, string text)
+        protected override bool IsTrivial(Enum type, string text)
         {
             switch ((JavaScriptTokenType) type)
             {

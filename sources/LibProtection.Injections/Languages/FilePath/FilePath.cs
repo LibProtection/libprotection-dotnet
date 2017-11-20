@@ -20,7 +20,13 @@ namespace LibProtection.Injections
             new RegexTokenDefinition($"[{DisallowedSymbols}]", FilePathTokenType.DisallowedSymbol),
         };
 
-        protected override bool IsSafeToken(Enum type, string text)
+        public override bool TrySanitize(string text, Token context, out string sanitized)
+        {
+            sanitized = null;
+            return false;
+        }
+
+        protected override bool IsTrivial(Enum type, string text)
         {
             return (FilePathTokenType) type == FilePathTokenType.FSEntryName && !text.Contains("..");
         }

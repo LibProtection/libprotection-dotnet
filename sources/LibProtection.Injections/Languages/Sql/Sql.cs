@@ -33,10 +33,11 @@ namespace LibProtection.Injections
                     throw new ArgumentException($"Unsupported JavaScript island: {context}");
             }
 
-            return base.TrySanitize(text, context, out sanitized);
+            sanitized = null;
+            return false;
         }
 
-        protected override bool IsSafeToken(Enum type, string text)
+        protected override bool IsTrivial(Enum type, string text)
         {
             switch ((SqlTokenType) type)
             {
