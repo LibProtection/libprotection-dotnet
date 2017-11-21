@@ -11,11 +11,11 @@ namespace LibProtection.Injections
 
         protected override IEnumerable<RegexTokenDefinition> TokenDefinitions { get; } = new[]
         {
-            new RegexTokenDefinition(@"[^:/?#]+:", UrlTokenType.Scheme),
+            new RegexTokenDefinition(@"[^:/?#]+:", UrlTokenType.SchemeCtx),
             new RegexTokenDefinition(@"//[^/?#]*", UrlTokenType.AuthorityCtx),
             new RegexTokenDefinition(@"[^?#]*", UrlTokenType.PathCtx),
             new RegexTokenDefinition(@"\?[^#]*", UrlTokenType.QueryCtx),
-            new RegexTokenDefinition(@"#.*", UrlTokenType.Fragment)
+            new RegexTokenDefinition(@"#.*", UrlTokenType.FragmentCtx)
         };
 
         private Url() { }
@@ -29,11 +29,15 @@ namespace LibProtection.Injections
 
                 switch ((UrlTokenType) token.Type)
                 {
+                    case UrlTokenType.SchemeCtx:
+                        foreach (var subToken in SplitToken(tokenText, lowerBound, ":", UrlTokenType.Scheme))
+                        {
+                            yield return subToken;
+                        }
+                        break;
+                    
                     case UrlTokenType.AuthorityCtx:
-                        tokenText = tokenText.Substring(2, tokenText.Length - 2);
-                        lowerBound += 2;
-
-                        foreach (var subToken in SplitToken(tokenText, lowerBound, ":@", UrlTokenType.AuthorityEntry))
+                        foreach (var subToken in SplitToken(tokenText, lowerBound, "\\/:@", UrlTokenType.AuthorityEntry))
                         {
                             yield return subToken;
                         }
@@ -47,7 +51,14 @@ namespace LibProtection.Injections
                         break;
 
                     case UrlTokenType.QueryCtx:
-                        foreach (var subToken in SplitToken(tokenText, lowerBound, "&=", UrlTokenType.QueryEntry))
+                        foreach (var subToken in SplitToken(tokenText, lowerBound, "?&=", UrlTokenType.QueryEntry))
+                        {
+                            yield return subToken;
+                        }
+                        break;
+                    
+                    case UrlTokenType.FragmentCtx:
+                        foreach (var subToken in SplitToken(tokenText, lowerBound, "#", UrlTokenType.Fragment))
                         {
                             yield return subToken;
                         }
@@ -109,12 +120,11 @@ namespace LibProtection.Injections
                         sb.Clear();
                         var upperBound = lowerBound + tokenText.Length - 1;
                         yield return CreateToken(tokenType, lowerBound, upperBound, tokenText);
-                        lowerBound = upperBound + 2;
+                        lowerBound = upperBound + 1;
                     }
-                    else
-                    {
-                        lowerBound++;
-                    }
+
+                    yield return CreateToken(UrlTokenType.Separator, lowerBound, lowerBound, c.ToString());
+                    lowerBound++;
                 }
                 else
                 {

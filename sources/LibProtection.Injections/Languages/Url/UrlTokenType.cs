@@ -3,6 +3,7 @@
     internal enum UrlTokenType
     {
         Error,
+        Separator,
         Scheme,
         AuthorityEntry,
         PathEntry,
@@ -10,8 +11,10 @@
         Fragment,
 
         // Non-terminals
+        SchemeCtx,
         AuthorityCtx,
         PathCtx,
         QueryCtx,
+        FragmentCtx
     }
 }
