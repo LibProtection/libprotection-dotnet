@@ -108,33 +108,33 @@ namespace LibProtection.Injections
         private IEnumerable<Token> SplitToken(string text, int lowerBound, string splitChars, UrlTokenType tokenType)
         {
             if (string.IsNullOrEmpty(text)) { yield break; }
-            var sb = new StringBuilder();
+            var tokenTextBuilder = new StringBuilder();
 
-            foreach (var c in text)
+            foreach (var currentChar in text)
             {
-                if (splitChars.Contains(c.ToString()))
+                if (splitChars.Contains(currentChar.ToString()))
                 {
-                    if (sb.Length != 0)
+                    if (tokenTextBuilder.Length != 0)
                     {
-                        var tokenText = sb.ToString();
-                        sb.Clear();
+                        var tokenText = tokenTextBuilder.ToString();
+                        tokenTextBuilder.Clear();
                         var upperBound = lowerBound + tokenText.Length - 1;
                         yield return CreateToken(tokenType, lowerBound, upperBound, tokenText);
                         lowerBound = upperBound + 1;
                     }
 
-                    yield return CreateToken(UrlTokenType.Separator, lowerBound, lowerBound, c.ToString());
+                    yield return CreateToken(UrlTokenType.Separator, lowerBound, lowerBound, currentChar.ToString());
                     lowerBound++;
                 }
                 else
                 {
-                    sb.Append(c);
+                    tokenTextBuilder.Append(currentChar);
                 }
             }
 
-            if (sb.Length != 0)
+            if (tokenTextBuilder.Length != 0)
             {
-                var lastTokenText = sb.ToString();
+                var lastTokenText = tokenTextBuilder.ToString();
                 yield return CreateToken(tokenType, lowerBound, lowerBound + lastTokenText.Length - 1, lastTokenText);
             }
         }
