@@ -6,6 +6,7 @@ namespace LibProtection.Injections
     {
         public Range Range { get; }
         public List<Token> Tokens { get; }
+        public bool IsTrivial => Tokens.TrueForAll(token => token.IsTrivial);
 
         public TokenScope(Range range)
         {
