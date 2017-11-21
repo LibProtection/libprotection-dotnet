@@ -41,6 +41,11 @@ namespace LibProtection.Injections
         {
             switch ((SqlTokenType) type)
             {
+                case SqlTokenType.Space:
+                    
+                case SqlTokenType.CommentInput:
+                case SqlTokenType.LineComment:
+                
                 case SqlTokenType.NullLiteral:
                 case SqlTokenType.FilesizeLiteral:
                 case SqlTokenType.StartNationalStringLiteral:

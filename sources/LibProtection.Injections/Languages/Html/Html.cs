@@ -230,8 +230,11 @@ namespace LibProtection.Injections
         {
             switch ((HtmlTokenType) type)
             {
+                case HtmlTokenType.SeaWs:
+                
                 case HtmlTokenType.HtmlComment:
                 case HtmlTokenType.HtmlConditionalComment:
+                    
                 case HtmlTokenType.HtmlText:
                 case HtmlTokenType.TagName:
                 case HtmlTokenType.Attribute:

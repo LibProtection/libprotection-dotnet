@@ -45,6 +45,11 @@ namespace LibProtection.Injections
         {
             switch ((JavaScriptTokenType) type)
             {
+                case JavaScriptTokenType.LineTerminator:
+                    
+                case JavaScriptTokenType.MultiLineComment:
+                case JavaScriptTokenType.SingleLineComment:
+                
                 case JavaScriptTokenType.RegularExpressionLiteral:
                 case JavaScriptTokenType.NullLiteral:
                 case JavaScriptTokenType.BooleanLiteral:
