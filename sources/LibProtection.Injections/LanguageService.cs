@@ -62,13 +62,9 @@ namespace LibProtection.Injections
 
             foreach (var scope in GetTokensScopes(tokens, ranges))
             {
-                // Vanile injection
-                if (scope.Tokens.Count != 1) { return false; }
-
-                // Fragmented injection
+                allTrivial &= scope.IsTrivial;
                 scopesCount++;
-                allTrivial &= scope.Tokens.All(token => token.IsTrivial);
-                if (scopesCount > 1 && !allTrivial) { return false; }
+                if ((scope.Tokens.Count > 1 || scopesCount > 1) && !allTrivial) { return false; }
             }
 
             return true;
