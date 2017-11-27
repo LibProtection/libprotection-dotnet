@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using Antlr4.Runtime;
 using LibProtection.Injections.Internals;
@@ -20,7 +19,10 @@ namespace LibProtection.Injections
             ResourceValue
         }
 
-        private const string LanguageNotSupportedTemplate = "{0} language is not currently supported";
+        private HashSet<string> HtmlUrlAttributes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "href", "src", "manifest", "poster", "code", "codebase", "data"
+        };
 
         private Html() { }
 
@@ -73,20 +75,11 @@ namespace LibProtection.Injections
                             context = HtmlTokenizerContext.Insignificant;
                             if (htmlTokenType == HtmlTokenType.TagName)
                             {
-                                var tokenLoweredText = token.Text.ToLowerInvariant();
-
-                                if (tokenLoweredText == "style")
-                                {
-                                    throw new LanguageNotSupportedException(string.Format(LanguageNotSupportedTemplate,
-                                        "CSS"));
-                                }
-
-                                if (tokenLoweredText.StartsWith("on"))
+                                if (token.Text.StartsWith("on", StringComparison.OrdinalIgnoreCase))
                                 {
                                     context = HtmlTokenizerContext.EventName;
                                 }
-                                else if (new[] { "href", "src", "manifest", "poster", "code", "codebase", "data" }
-                                    .Contains(tokenLoweredText))
+                                else if (HtmlUrlAttributes.Contains(token.Text))
                                 {
                                     context = HtmlTokenizerContext.ResourceName;
                                 }
@@ -143,11 +136,6 @@ namespace LibProtection.Injections
 
                 default:
                     var htmlTokenType = (HtmlTokenType)htmlToken.Type;
-
-                    if (htmlTokenType == HtmlTokenType.StyleBody || htmlTokenType == HtmlTokenType.StyleShortBody)
-                    {
-                        throw new LanguageNotSupportedException(string.Format(LanguageNotSupportedTemplate, "CSS"));
-                    }
 
                     if (htmlTokenType == HtmlTokenType.ScriptBody || htmlTokenType == HtmlTokenType.ScriptShortBody)
                     {

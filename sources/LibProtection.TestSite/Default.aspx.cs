@@ -147,7 +147,7 @@ namespace LibProtection.TestSite
             if (string.IsNullOrWhiteSpace(request)) { return string.Empty; }
             string result;
 
-            using (var connection = new SQLiteConnection(@"Data Source=|DataDirectory|\Database.sqlite;Version=3;"))
+            using (var connection = new SQLiteConnection(@"Data Source=|DataDirectory|\Database.sqlite;Version=3;Read Only=True;"))
             {
                 using (var adapter = new SQLiteDataAdapter())
                 {
