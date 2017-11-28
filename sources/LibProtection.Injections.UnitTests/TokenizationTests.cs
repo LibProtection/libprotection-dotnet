@@ -94,10 +94,24 @@ namespace LibProtection.Injections.UnitTests
             if (File.Exists(tokensFileName))
             {
                 string[] expectedTokens = File.ReadAllLines(tokensFileName);
-                if (expectedTokens.SequenceEqual(obtainedTokens))
+
+                if (expectedTokens.Length != obtainedTokens.Length)
                 {
-                    return true;
+                    throw new Exception("Lengths of expected and obtained token-arrays are different");
                 }
+
+                for (var tokenIndex = 0; tokenIndex < expectedTokens.Length; tokenIndex++)
+                {
+                    var expectedToken = expectedTokens[tokenIndex];
+                    var obtainedToken = obtainedTokens[tokenIndex];
+
+                    if (expectedToken != obtainedToken)
+                    {
+                        throw new Exception($"Expected at {tokenIndex}: `{expectedToken}` but obtained: `{obtainedToken}`");
+                    }
+                }
+
+                return true;
             }
             else
             {
@@ -134,7 +148,7 @@ namespace LibProtection.Injections.UnitTests
             {
                 yield return new TestCaseData(languageName, fileName)
                     .Returns(true)
-                    .SetName(Path.GetFileNameWithoutExtension(fileName));
+                    .SetName(Path.GetFileName(fileName));
             }
         }
     }
