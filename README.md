@@ -11,8 +11,8 @@
 The library considers each placeholder in a processed format or interpolated string as a potential injection point. In each of these points, it performs the following actions:
 
 1. Decides the grammatical context of the possible injection (taking into account island grammars if necessary).
-2. If sanitization rules are defined for the given context, the data transferred to the placeholder is sanitized. Otherwise, the data is inserted as is.
-3. If their number exceeds 1, then the library reports an attack (throwing an exception or returning a false value, depending on the formatting method used).
+2. If sanitization rules are defined for the given context, it sanitizes data belonging to the placeholder. Otherwise, data inserts as is.
+3. Performs tokenization and counting the number of tokens. If their number exceeds 1, then an attack is reported (by throwing an exception or returning a false value, depending on the formatting method used).
 
 ## Quick example
 
@@ -21,6 +21,7 @@ The following code is vulnerable to injection attacks at three different points 
 ```
 Response.Write($"<a href='{a}' onclick='alert("{b}");return false'>{c}</a>");
 ```
+
 Assume that the attacker passed the following values to the variables a, b and c:
 
 a = `'onmouseover='alert(``XSS``)`
