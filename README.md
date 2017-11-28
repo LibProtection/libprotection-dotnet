@@ -24,13 +24,13 @@ Response.Write($"<a href='{a}' onclick='alert("{b}");return false'>{c}</a>");
 
 Assume that the attacker passed the following values to the variables a, b and c:
 
-a = `'onmouseover='alert(``XSS``)`
-b = `");alert(``XSS``)`
-c = `<script>alert(``XSS``)</script>`
+a = ``'onmouseover='alert(`XSS`)``
+b = ``");alert(`XSS`)``
+c = ``<script>alert(`XSS`)</script>``
 
 After interpolation, the resulting string will look like this:
 
-`<a href=''onmouseover='alert(``XSS``)' onclick='alert("");alert(``XSS``)");return false'><script>alert(``XSS``)</script></a>`
+``<a href=''onmouseover='alert(`XSS`)' onclick='alert("");alert(`XSS`)");return false'><script>alert(`XSS`)</script></a>``
 
 Thus, the attacker has the ability to implement the XSS attack in three different ways. However, after trivial wrapping of the interpolated string in the LibProtection API call, this code becomes absolutely protected:
 
@@ -40,4 +40,4 @@ Response.Write(SafeString.Format<Html>($"<a href='{a}' onclick='alert("{b}");ret
 
 In this case, after interpolation, the resulting string will look like this:
 
-`<a href='%27onmouseover%3d%27alert(%60XSS%60)' onclick='alert("\&quot;);alert(``XSS``)");return false'>&lt;script&gt;alert(``XSS``)&lt;/script&gt;</a>`
+``<a href='%27onmouseover%3d%27alert(%60XSS%60)' onclick='alert("\&quot;);alert(`XSS`)");return false'>&lt;script&gt;alert(`XSS`)&lt;/script&gt;</a>``
