@@ -1,1 +1,0 @@
-﻿SELECT * FROM table1 WHERE id1=0 AND id2="str" ORDER BY col1

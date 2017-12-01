@@ -88,19 +88,19 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Antlr4 Include="..\..\submodules\libprotection-grammars\Antlr\HTMLLexer.g4">
+    <Antlr4 Include="..\..\submodules\libprotection-common\grammars\HTMLLexer.g4">
       <Link>Languages\Html\HTMLLexer.g4</Link>
       <CustomToolNamespace>LibProtection.Injections.Internals</CustomToolNamespace>
       <Listener>False</Listener>
       <Visitor>False</Visitor>
     </Antlr4>
-    <Antlr4 Include="..\..\submodules\libprotection-grammars\Antlr\SQLLexer.g4">
+    <Antlr4 Include="..\..\submodules\libprotection-common\grammars\SQLLexer.g4">
       <Link>Languages\Sql\SQLLexer.g4</Link>
       <CustomToolNamespace>LibProtection.Injections.Internals</CustomToolNamespace>
       <Listener>False</Listener>
       <Visitor>False</Visitor>
     </Antlr4>
-    <Antlr4 Include="..\..\submodules\libprotection-grammars\Antlr\JavaScriptCSharp.g4">
+    <Antlr4 Include="..\..\submodules\libprotection-common\grammars\JavaScriptCSharp.g4">
       <Link>Languages\JavaScript\JavaScriptCSharp.g4</Link>
       <CustomToolNamespace>LibProtection.Injections.Internals</CustomToolNamespace>
       <Listener>False</Listener>

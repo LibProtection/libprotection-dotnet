@@ -55,7 +55,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="TokenizationTestCases\*">
+    <None Include="..\..\submodules\libprotection-common\test-cases\**\*.*">
+      <Link>TestCases\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -70,6 +71,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>rd /s /q "$(TargetDir)\TokenizationTestCases"</PreBuildEvent>
+    <PreBuildEvent>rd /s /q "$(TargetDir)\TestCases"</PreBuildEvent>
   </PropertyGroup>
 </Project>

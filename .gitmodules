@@ -1,4 +1,4 @@
-[submodule "submodules/libprotection-grammars"]
-	path = submodules/libprotection-grammars
-	url = https://github.com/LibProtection/libprotection-grammars.git
-	branch = dev
+[submodule "submodules/libprotection-common"]
+	path = submodules/libprotection-common
+	url = https://github.com/LibProtection/libprotection-common.git
+    branch = dev

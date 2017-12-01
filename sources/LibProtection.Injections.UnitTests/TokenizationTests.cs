@@ -142,7 +142,7 @@ namespace LibProtection.Injections.UnitTests
         private static IEnumerable TestCases(string languageName)
         {
             var casesDirectory =
-                Path.Combine(TestContext.CurrentContext.TestDirectory, "TokenizationTestCases");
+                Path.Combine(TestContext.CurrentContext.TestDirectory, "TestCases\\tokenization");
 
             foreach (var fileName in Directory.GetFiles(casesDirectory, $"*.{languageName}"))
             {
