@@ -9,12 +9,5 @@
         PathEntry,
         QueryEntry,
         Fragment,
-
-        // Non-terminals
-        SchemeCtx,
-        AuthorityCtx,
-        PathCtx,
-        QueryCtx,
-        FragmentCtx
     }
 }
