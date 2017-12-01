@@ -1,40 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace LibProtection.Injections
 {
     public sealed class RegexRule
     {
-        public Enum Type { get; }
-        public IEnumerable<RegexRule> ModeRules { get; }
+        public Enum Type { get; private set; }
+        public IEnumerable<RegexRule> ModeRules { get; private set; }
         public bool IsPushMode => ModeRules != null;
-        public bool IsPopMode { get; }
+        public bool IsPopMode { get; private set; }
         public bool IsToken => Type != null;
 
         private readonly Regex _regex;
 
-        private RegexRule(string regex, bool isPopMode = false)
+        private RegexRule(string regex)
         {
             _regex = new Regex($"^{regex}", RegexOptions.Compiled);
-            IsPopMode = isPopMode;
-        }
-
-        private RegexRule(string regex, Enum type, bool isPopMode = false) : this(regex, isPopMode)
-        {
-            Type = type;
-            IsPopMode = isPopMode;
-        }
-
-        private RegexRule(string regex, Enum type, IEnumerable<RegexRule> modeRules) : this(regex, type)
-        {
-            ModeRules = modeRules;
-        }
-
-        private RegexRule(string regex, IEnumerable<RegexRule> modeRules) : this(regex)
-        {
-            ModeRules = modeRules;
         }
 
         public bool TryMatch(string text, out int length)
@@ -46,17 +28,17 @@ namespace LibProtection.Injections
 
         public static RegexRule Token(string regex, Enum type)
         {
-            return new RegexRule(regex, type);
+            return new RegexRule(regex) { Type = type };
         }
 
         public static RegexRule TokenPushMode(string regex, Enum type, IEnumerable<RegexRule> modeRules)
         {
-            return new RegexRule(regex, type, modeRules);
+            return new RegexRule(regex) {Type = type, ModeRules = modeRules};
         }
 
         public static RegexRule TokenPopMode(string regex, Enum type)
         {
-            return new RegexRule(regex, type, isPopMode: true);
+            return new RegexRule(regex) { Type = type, IsPopMode = true};
         }
 
         public static RegexRule NoToken(string regex)
@@ -66,12 +48,12 @@ namespace LibProtection.Injections
 
         public static RegexRule NoTokenPushMode(string regex, IEnumerable<RegexRule> modeRules)
         {
-            return new RegexRule(regex, modeRules);
+            return new RegexRule(regex) { ModeRules =  modeRules };
         }
 
         public static RegexRule NoTokenPopMode(string regex)
         {
-            return new RegexRule(regex, isPopMode: true);
+            return new RegexRule(regex) { IsPopMode = true };
         }
     }
 }
