@@ -70,7 +70,7 @@
     <Compile Include="LanguageService.cs" />
     <Compile Include="Languages\FilePath\FilePath.cs" />
     <Compile Include="Languages\FilePath\FilePathTokenType.cs" />
-    <Compile Include="Languages\RegexTokenDefinition.cs" />
+    <Compile Include="Languages\RegexRule.cs" />
     <Compile Include="Languages\Sql\Sql.cs" />
     <Compile Include="Languages\Sql\SqlTokenType.cs" />
     <Compile Include="Languages\Token.cs" />

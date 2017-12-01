@@ -6,29 +6,38 @@ namespace LibProtection.Injections
     public abstract class RegexLanguageProvider : LanguageProvider
     {
         protected abstract Enum ErrorTokenType { get; }
-        protected abstract IEnumerable<RegexTokenDefinition> TokenDefinitions { get; }
+        protected abstract IEnumerable<RegexRule> MainModeRules { get; }
 
         public override IEnumerable<Token> Tokenize(string text, int offset = 0)
         {
             var currentPosition = 0;
+            var modeRulesStack = new Stack<IEnumerable<RegexRule>>();
+            modeRulesStack.Push(MainModeRules);
 
             while (!string.IsNullOrEmpty(text))
             {
                 var isMatched = false;
 
-                foreach (var tokenDefinition in TokenDefinitions)
+                foreach (var rule in modeRulesStack.Peek())
                 {
-                    if (tokenDefinition.TryMatch(text, out var matchedLength) && matchedLength != 0)
+                    if (rule.TryMatch(text, out var matchedLength) && matchedLength != 0)
                     {
                         isMatched = true;
-                        var tokenText = text.Substring(0, matchedLength);
+                        if (rule.IsToken)
+                        {
+                            var tokenText = text.Substring(0, matchedLength);
 
-                        var token = CreateToken(tokenDefinition.Type, currentPosition + offset,
-                            currentPosition + offset + tokenText.Length - 1, tokenText);
+                            var token = CreateToken(rule.Type, currentPosition + offset,
+                                currentPosition + offset + tokenText.Length - 1, tokenText);
 
-                        text = text.Substring(matchedLength);
-                        currentPosition += matchedLength;
-                        yield return token;
+                            text = text.Substring(matchedLength);
+                            currentPosition += matchedLength;
+                            yield return token;
+                        }
+
+                        if (rule.IsPopMode) { modeRulesStack.Pop(); }
+                        if (rule.IsPushMode) { modeRulesStack.Push(rule.ModeRules); }
+
                         break;
                     }
                 }
@@ -37,7 +46,7 @@ namespace LibProtection.Injections
                 if (!isMatched)
                 {
                     var token = CreateToken(ErrorTokenType, currentPosition + offset, currentPosition + offset,
-                        text.Substring(0, 1));
+                        text[0].ToString());
 
                     text = text.Substring(1);
                     currentPosition++;

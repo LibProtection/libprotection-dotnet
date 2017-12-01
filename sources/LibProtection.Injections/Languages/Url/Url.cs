@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Web;
 
 namespace LibProtection.Injections
@@ -9,67 +8,51 @@ namespace LibProtection.Injections
     {
         protected override Enum ErrorTokenType { get; } = UrlTokenType.Error;
 
-        protected override IEnumerable<RegexTokenDefinition> TokenDefinitions { get; } = new[]
+        protected override IEnumerable<RegexRule> MainModeRules { get; } = new[]
         {
-            new RegexTokenDefinition(@"[^:/?#]+:", UrlTokenType.SchemeCtx),
-            new RegexTokenDefinition(@"//[^/?#]*", UrlTokenType.AuthorityCtx),
-            new RegexTokenDefinition(@"[^?#]*", UrlTokenType.PathCtx),
-            new RegexTokenDefinition(@"\?[^#]*", UrlTokenType.QueryCtx),
-            new RegexTokenDefinition(@"#.*", UrlTokenType.FragmentCtx)
+            RegexRule.NoTokenPushMode(@"[^:/?#]+:", SchemeModeRules),
+            RegexRule.NoTokenPushMode(@"//[^/?#]*", AuthorityModeRules),
+            RegexRule.NoTokenPushMode(@"[^?#]*",    PathModeRules),
+            RegexRule.NoTokenPushMode(@"\?[^#]*",   QueryModeRules),
+            RegexRule.NoTokenPushMode(@"#.*",       FragmentModeRules)
+        };
+
+        private static readonly IEnumerable<RegexRule> SchemeModeRules = new[]
+        {
+            RegexRule.Token("[^:]+", UrlTokenType.Scheme),
+            RegexRule.TokenPopMode(":", UrlTokenType.Separator)
+        };
+
+        private static readonly IEnumerable<RegexRule> AuthorityModeRules = new[]
+        {
+            RegexRule.Token("//", UrlTokenType.Separator),
+            RegexRule.Token("[^/@:]+", UrlTokenType.AuthorityEntry),
+            RegexRule.Token("[:@]", UrlTokenType.Separator),
+            RegexRule.NoTokenPopMode("/")
+        };
+
+        private static readonly IEnumerable<RegexRule> PathModeRules = new[]
+        {
+            RegexRule.Token("/", UrlTokenType.Separator),
+            RegexRule.Token("[^/?#]+", UrlTokenType.PathEntry),
+            RegexRule.NoTokenPopMode("[?#]")
+        };
+
+        private static readonly IEnumerable<RegexRule> QueryModeRules = new[]
+        {
+            RegexRule.Token("\\?", UrlTokenType.Separator),
+            RegexRule.Token("[^?/=&#]+", UrlTokenType.QueryEntry),
+            RegexRule.Token("[=&]", UrlTokenType.Separator),
+            RegexRule.NoTokenPopMode("#"), 
+        };
+
+        private static readonly IEnumerable<RegexRule> FragmentModeRules = new[]
+        {
+            RegexRule.Token("#", UrlTokenType.Separator),
+            RegexRule.TokenPopMode("[^#]*", UrlTokenType.Fragment), 
         };
 
         private Url() { }
-
-        public override IEnumerable<Token> Tokenize(string text, int offset = 0)
-        {
-            foreach (var token in base.Tokenize(text, offset))
-            {
-                var tokenText = token.Text;
-                var lowerBound = token.Range.LowerBound;
-
-                switch ((UrlTokenType) token.Type)
-                {
-                    case UrlTokenType.SchemeCtx:
-                        foreach (var subToken in SplitToken(tokenText, lowerBound, ":", UrlTokenType.Scheme))
-                        {
-                            yield return subToken;
-                        }
-                        break;
-                    
-                    case UrlTokenType.AuthorityCtx:
-                        foreach (var subToken in SplitToken(tokenText, lowerBound, "\\/:@", UrlTokenType.AuthorityEntry))
-                        {
-                            yield return subToken;
-                        }
-                        break;
-
-                    case UrlTokenType.PathCtx:
-                        foreach (var subToken in SplitToken(tokenText, lowerBound, "\\/", UrlTokenType.PathEntry))
-                        {
-                            yield return subToken;
-                        }
-                        break;
-
-                    case UrlTokenType.QueryCtx:
-                        foreach (var subToken in SplitToken(tokenText, lowerBound, "?&=", UrlTokenType.QueryEntry))
-                        {
-                            yield return subToken;
-                        }
-                        break;
-                    
-                    case UrlTokenType.FragmentCtx:
-                        foreach (var subToken in SplitToken(tokenText, lowerBound, "#", UrlTokenType.Fragment))
-                        {
-                            yield return subToken;
-                        }
-                        break;
-
-                    default:
-                        yield return token;
-                        break;
-                }
-            }
-        }
 
         public override bool TrySanitize(string text, Token context, out string sanitized)
         {
@@ -103,40 +86,6 @@ namespace LibProtection.Injections
             }
 
             return false;
-        }
-
-        private IEnumerable<Token> SplitToken(string text, int lowerBound, string splitChars, UrlTokenType tokenType)
-        {
-            if (string.IsNullOrEmpty(text)) { yield break; }
-            var tokenTextBuilder = new StringBuilder();
-
-            foreach (var currentChar in text)
-            {
-                if (splitChars.Contains(currentChar.ToString()))
-                {
-                    if (tokenTextBuilder.Length != 0)
-                    {
-                        var tokenText = tokenTextBuilder.ToString();
-                        tokenTextBuilder.Clear();
-                        var upperBound = lowerBound + tokenText.Length - 1;
-                        yield return CreateToken(tokenType, lowerBound, upperBound, tokenText);
-                        lowerBound = upperBound + 1;
-                    }
-
-                    yield return CreateToken(UrlTokenType.Separator, lowerBound, lowerBound, currentChar.ToString());
-                    lowerBound++;
-                }
-                else
-                {
-                    tokenTextBuilder.Append(currentChar);
-                }
-            }
-
-            if (tokenTextBuilder.Length != 0)
-            {
-                var lastTokenText = tokenTextBuilder.ToString();
-                yield return CreateToken(tokenType, lowerBound, lowerBound + lastTokenText.Length - 1, lastTokenText);
-            }
         }
 
         private static bool TryUrlEncode(string text, UrlTokenType tokenType, out string encoded)

@@ -11,16 +11,15 @@ namespace LibProtection.Injections
 
         protected override Enum ErrorTokenType => FilePathTokenType.Error;
 
-        protected override IEnumerable<RegexTokenDefinition> TokenDefinitions { get; } = new[]
+        protected override IEnumerable<RegexRule> MainModeRules { get; } = new[]
         {
-            new RegexTokenDefinition(@"[\\/]+", FilePathTokenType.Separator),
-            new RegexTokenDefinition(@"[a-zA-Z]+[\$:](?=[\\/])", FilePathTokenType.DeviceID),
-            new RegexTokenDefinition(@"[^" + DisallowedSymbols + "]+", FilePathTokenType.FSEntryName),
-            new RegexTokenDefinition(@":+\$[^" + DisallowedSymbols + "]+", FilePathTokenType.NTFSAttribute),
-            new RegexTokenDefinition($"[{DisallowedSymbols}]", FilePathTokenType.DisallowedSymbol),
+            RegexRule.Token(@"[\\/]+",                            FilePathTokenType.Separator),
+            RegexRule.Token(@"[a-zA-Z]+[\$:](?=[\\/])",           FilePathTokenType.DeviceID),
+            RegexRule.Token(@"[^" + DisallowedSymbols + "]+",     FilePathTokenType.FSEntryName),
+            RegexRule.Token(@":+\$[^" + DisallowedSymbols + "]+", FilePathTokenType.NTFSAttribute),
+            RegexRule.Token($"[{DisallowedSymbols}]",             FilePathTokenType.DisallowedSymbol),
         };
-
-        public override bool TrySanitize(string text, Token context, out string sanitized)
+        public override bool TrySanitize(string text, Token context, out string sanitized)
         {
             sanitized = null;
             return false;
