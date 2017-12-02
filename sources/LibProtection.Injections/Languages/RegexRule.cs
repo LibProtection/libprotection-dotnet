@@ -16,7 +16,7 @@ namespace LibProtection.Injections
 
         private RegexRule(string regex)
         {
-            _regex = new Regex($"^{regex}", RegexOptions.Compiled);
+            _regex = new Regex($"^{regex}", RegexOptions.Compiled | RegexOptions.Singleline);
         }
 
         public bool TryMatch(string text, out int length)
