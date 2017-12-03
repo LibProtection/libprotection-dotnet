@@ -1,6 +1,6 @@
 # libprotection-dotnet
 
-**libprotection-dotnet** is a .NET implementation of LibProtection library — an alternative implementation of the standard functionality of formatted and interpolated strings. It provides realtime automatic protection from any class of the injection attacks belongs to the most attacked languages (HTML, URL, JavaScript, SQL and file paths are currently supported).
+**libprotection-dotnet** is a .NET implementation of LibProtection library — an alternative implementation of the standard functionality of the formatted and interpolated strings. It provides a realtime automatic protection from any class of the injection attacks which belong to the most attacked languages (HTML, URL, JavaScript, SQL and the file paths are currently supported).
 
 | Windows Build Status |
 |---|
@@ -8,15 +8,15 @@
 
 ## How it works
 
-The library considers each placeholder in a processed format or interpolated string as a potential injection point. In each of these points, it performs the following actions:
+The library considers each placeholder in a processed interpolated or format string as a potentially injection point. It performs the following actions in each of these points:
 
-1. Decides the grammatical context of the possible injection (taking into account island grammars if necessary).
-2. If sanitization rules are defined for the given context, it sanitizes data belonging to the placeholder. Otherwise, data inserts as is.
-3. Performs tokenization and counting the number of tokens. If their number exceeds 1, then an attack is reported (by throwing an exception or returning a false value, depending on the formatting method used).
+1. It decides a grammatical context of the possible injection (taking into account the island grammars, if necessary).
+2. If sanitization rules are defined for the given context, then it sanitizes data which belongs to the placeholder. Otherwise, data inserts as is.
+3. It performs tokenization of the input data and counting an amount of tokens. If it exceeds 1, then an attack is reported (by throwing an exception or returning a false value, depending on a used library method).
 
 ## Quick example
 
-The following code is vulnerable to injection attacks at three different points (provided that variables a, b and c contains values that are sufficiently controlled by the attacker):
+The following code is vulnerable to injection attacks at three different points (provided that variables a, b and c contain values which were derived from the input data):
 
 ```
 Response.Write($"<a href='{a}' onclick='alert("{b}");return false'>{c}</a>");
@@ -32,7 +32,7 @@ After interpolation, the resulting string will look like this:
 
 ``<a href=''onmouseover='alert(`XSS`)' onclick='alert("");alert(`XSS`)");return false'><script>alert(`XSS`)</script></a>``
 
-Thus, the attacker has the ability to implement the XSS attack in three different ways. However, after trivial wrapping of the interpolated string in the LibProtection API call, this code becomes absolutely protected:
+Thus, the attacker has the ability to implement the XSS attack by three different ways. However, after trivial wrapping the interpolated string in the LibProtection API call, this code becomes absolutely protected:
 
 ```
 Response.Write(SafeString.Format<Html>($"<a href='{a}' onclick='alert("{b}");return false'>{c}</a>"));
