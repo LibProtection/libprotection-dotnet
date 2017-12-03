@@ -1,6 +1,6 @@
 # libprotection-dotnet
 
-**libprotection-dotnet** is a .NET implementation of LibProtection library — an alternative implementation of the standard functionality of the formatted and interpolated strings. It provides a realtime automatic protection from any class of the injection attacks which belong to the most attacked languages (HTML, URL, JavaScript, SQL and the file paths are currently supported).
+**libprotection-dotnet** is a .NET version of LibProtection library — an alternative implementation of the standard functionality of the formatted and interpolated strings. It provides a realtime automatic protection from any class of the injection attacks which belong to the most attacked languages (HTML, URL, JavaScript, SQL and the file paths are currently supported).
 
 | Windows Build Status |
 |---|
