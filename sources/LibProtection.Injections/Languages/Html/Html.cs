@@ -8,7 +8,7 @@ namespace LibProtection.Injections
 {
     public sealed class Html : AntlrLanguageProvider
     {
-        private enum HtmlTokenizerContext
+        private enum HtmlTokenizerState
         {
             Insignificant,
             EventName,
@@ -19,9 +19,10 @@ namespace LibProtection.Injections
             ResourceValue
         }
 
-        private HashSet<string> HtmlUrlAttributes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        private readonly HashSet<string> _htmlUrlAttributes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            "href", "src", "manifest", "poster", "code", "codebase", "data"
+            "href", "src", "manifest", "poster", "code", "codebase", "data", "xlink:href", "xml:base", "from", "to",
+            "formaction", "action"
         };
 
         private Html() { }
@@ -38,57 +39,73 @@ namespace LibProtection.Injections
 
         public override IEnumerable<Token> Tokenize(string text, int offset = 0)
         {
-            var context = HtmlTokenizerContext.Insignificant;
+            var state = HtmlTokenizerState.Insignificant;
+            var insideScriptTag = false;
 
             foreach (var token in base.Tokenize(text, offset))
             {
                 if (token.LanguageProvider is Html)
                 {
                     var htmlTokenType = (HtmlTokenType)token.Type;
-                    switch (context)
+                    switch (state)
                     {
-                        case HtmlTokenizerContext.EventName:
-                            context = htmlTokenType == HtmlTokenType.TagEquals
-                            ? HtmlTokenizerContext.EventEqualSign
-                            : HtmlTokenizerContext.Insignificant;
+                        case HtmlTokenizerState.EventName:
+                            state = htmlTokenType == HtmlTokenType.TagEquals
+                            ? HtmlTokenizerState.EventEqualSign
+                            : HtmlTokenizerState.Insignificant;
                             break;
 
-                        case HtmlTokenizerContext.EventEqualSign:
-                            context = htmlTokenType == HtmlTokenType.AttvalueValue
-                                ? HtmlTokenizerContext.EventValue
-                                : HtmlTokenizerContext.Insignificant;
+                        case HtmlTokenizerState.EventEqualSign:
+                            state = htmlTokenType == HtmlTokenType.AttributeValue
+                                ? HtmlTokenizerState.EventValue
+                                : HtmlTokenizerState.Insignificant;
                             break;
 
-                        case HtmlTokenizerContext.ResourceName:
-                            context = htmlTokenType == HtmlTokenType.TagEquals
-                                ? HtmlTokenizerContext.ResourceEqualSign
-                                : HtmlTokenizerContext.Insignificant;
+                        case HtmlTokenizerState.ResourceName:
+                            state = htmlTokenType == HtmlTokenType.TagEquals
+                                ? HtmlTokenizerState.ResourceEqualSign
+                                : HtmlTokenizerState.Insignificant;
                             break;
 
-                        case HtmlTokenizerContext.ResourceEqualSign:
-                            context = htmlTokenType == HtmlTokenType.AttvalueValue
-                                ? HtmlTokenizerContext.ResourceValue
-                                : HtmlTokenizerContext.Insignificant;
+                        case HtmlTokenizerState.ResourceEqualSign:
+                            state = htmlTokenType == HtmlTokenType.AttributeValue
+                                ? HtmlTokenizerState.ResourceValue
+                                : HtmlTokenizerState.Insignificant;
                             break;
 
                         default:
-                            context = HtmlTokenizerContext.Insignificant;
-                            if (htmlTokenType == HtmlTokenType.TagName)
+                            state = HtmlTokenizerState.Insignificant;
+                            switch (htmlTokenType)
                             {
-                                if (token.Text.StartsWith("on", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    context = HtmlTokenizerContext.EventName;
-                                }
-                                else if (HtmlUrlAttributes.Contains(token.Text))
-                                {
-                                    context = HtmlTokenizerContext.ResourceName;
-                                }
+                                case HtmlTokenType.AttributeName:
+                                    if (token.Text.StartsWith("on", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        state = HtmlTokenizerState.EventName;
+                                    }
+                                    else if (_htmlUrlAttributes.Contains(token.Text))
+                                    {
+                                        state = HtmlTokenizerState.ResourceName;
+                                    }
+                                    break;
+
+                                case HtmlTokenType.TagOpen:
+                                    if (string.Equals(token.Text, "<script", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        insideScriptTag = true;
+                                    }
+                                    else
+                                    if (string.Equals(token.Text, "</script", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        insideScriptTag = false;
+                                    }
+
+                                    break;
                             }
 
                             break;
                     }
 
-                    if (IsContextChanged(token, context, out var islandData))
+                    if (IsContextChanged(token, state, insideScriptTag, out var islandData))
                     {
                         var islandTokens = islandData.LanguageProvider.Tokenize(islandData.Text, islandData.Offset);
                         foreach (var islandToken in islandTokens)
@@ -104,13 +121,14 @@ namespace LibProtection.Injections
             }
         }
 
-        private static bool IsContextChanged(Token htmlToken, HtmlTokenizerContext context, out IslandDto islandData)
+        private static bool IsContextChanged(Token htmlToken, HtmlTokenizerState context, bool insideScriptTag, 
+            out IslandDto islandData)
         {
             islandData = null;
 
             switch (context)
             {
-                case HtmlTokenizerContext.EventValue:
+                case HtmlTokenizerState.EventValue:
                     {
                         var islandText = TrimQuotes(htmlToken, out var offset);
 
@@ -122,7 +140,7 @@ namespace LibProtection.Injections
                         break;
                     }
 
-                case HtmlTokenizerContext.ResourceValue:
+                case HtmlTokenizerState.ResourceValue:
                     {
                         var islandText = TrimQuotes(htmlToken, out var offset);
 
@@ -137,23 +155,19 @@ namespace LibProtection.Injections
                 default:
                     var htmlTokenType = (HtmlTokenType)htmlToken.Type;
 
-                    if (htmlTokenType == HtmlTokenType.ScriptBody || htmlTokenType == HtmlTokenType.ScriptShortBody)
+                    if (insideScriptTag)
                     {
-                        // `</script>` or `</>` case
-                        // Remove trailing tag
-                        var closingTagIndex = htmlToken.Text.Length - 2;
-
-                        while (htmlToken.Text.Substring(closingTagIndex, 2) != "</" && closingTagIndex >= 0)
+                        switch (htmlTokenType)
                         {
-                            closingTagIndex--;
+                            case HtmlTokenType.HtmlText:
+                                islandData = new IslandDto(Single<JavaScript>.Instance, htmlToken.Range.LowerBound,
+                                    htmlToken.Text);
+                                break;
+
+                            case HtmlTokenType.HtmlComment:
+                                // TODO: implement
+                                break;
                         }
-
-                        var islandText = closingTagIndex >= 0
-                            ? htmlToken.Text.Substring(0, closingTagIndex)
-                            : htmlToken.Text;
-
-                        islandData = new IslandDto(Single<JavaScript>.Instance,
-                            htmlToken.Range.LowerBound, islandText);
                     }
 
                     break;
@@ -193,7 +207,7 @@ namespace LibProtection.Injections
                 case Url _:
                     if (Single<Url>.Instance.TrySanitize(text, context, out var urlSanitized))
                     {
-                        sanitized = HtmlEncode(urlSanitized, HtmlTokenType.Attribute);
+                        sanitized = HtmlEncode(urlSanitized, HtmlTokenType.AttributeValue);
                         return true;
                     }
                     break;
@@ -218,14 +232,12 @@ namespace LibProtection.Injections
         {
             switch ((HtmlTokenType) type)
             {
-                case HtmlTokenType.SeaWs:
-                
                 case HtmlTokenType.HtmlComment:
                 case HtmlTokenType.HtmlConditionalComment:
-                    
                 case HtmlTokenType.HtmlText:
-                case HtmlTokenType.TagName:
-                case HtmlTokenType.Attribute:
+                case HtmlTokenType.Cdata:
+                case HtmlTokenType.AttributeWhiteSpace:
+                case HtmlTokenType.AttributeValue:
                     return true;
             }
 
@@ -236,9 +248,7 @@ namespace LibProtection.Injections
         {
             switch (tokenType)
             {
-                case HtmlTokenType.AttvalueValue:
-                case HtmlTokenType.Attribute:
-                case HtmlTokenType.ErrorAttvalue:
+                case HtmlTokenType.AttributeValue:
                     return HttpUtility.HtmlAttributeEncode(text);
 
                 default:
