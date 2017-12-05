@@ -2,7 +2,7 @@
 
 ## Disclaimer
 
-This project is in the state of early beta. It is stable enough for the public testing, but can be used at the production environments only at your own risk.
+This project is in the state of early beta. It is stable enough for the public testing, but should be used at the production environments only at your own risk.
 
 **Libprotection.NET** is a .NET version of LibProtection library — an alternative implementation of the standard functionality of the formatted and interpolated strings. It provides a realtime automatic protection from any class of the injection attacks, which belong to the most attacked languages (HTML, URL, JavaScript, SQL and the file paths are currently supported).
 
