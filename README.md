@@ -1,6 +1,10 @@
-# libprotection-dotnet
+# LibProtection.NET
 
-**libprotection-dotnet** is a .NET version of LibProtection library — an alternative implementation of the standard functionality of the formatted and interpolated strings. It provides a realtime automatic protection from any class of the injection attacks, which belong to the most attacked languages (HTML, URL, JavaScript, SQL and the file paths are currently supported).
+## Disclaimer
+
+This project is in the state of early beta. It is stable enough for the public testing, but can be used at the production environments only at your own risk.
+
+**Libprotection.NET** is a .NET version of LibProtection library — an alternative implementation of the standard functionality of the formatted and interpolated strings. It provides a realtime automatic protection from any class of the injection attacks, which belong to the most attacked languages (HTML, URL, JavaScript, SQL and the file paths are currently supported).
 
 | Windows Build Status |
 |---|
@@ -41,3 +45,7 @@ Response.Write(SafeString.Format<Html>($"<a href='{a}' onclick='alert("{b}");ret
 In this case, after interpolation, the resulting string will look like this:
 
 ``<a href='%27onmouseover%3d%27alert(%60XSS%60)' onclick='alert("\&quot;);alert(`XSS`)");return false'>&lt;script&gt;alert(`XSS`)&lt;/script&gt;</a>``
+
+## Try it online
+
+A test site that imitates a vulnerable application protected by the library is available [here](http://playground.libprotection.org/).
