@@ -43,12 +43,20 @@
             <a href="https://github.com/LibProtection/libprotection-dotnet"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png"></a>
         </div>
         <div class="container">
-            <div class="alert alert-dismissible alert-warning" id="disclaimer">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                <h4>Warning!</h4>
-                <p>This site mimics the behavior of a vulnerable web application that performs string formatting via <a href="https://github.com/LibProtection/libprotection-dotnet">LibProtection</a> library API to generate the arguments for the potentially vulnerable operations based on the input data.</p>
-                <p>Therefore, don't be evil. The vulnerable operations are actually executed here. In order to give you complete freedom to test the functionality of the library, a set of the possible values of the "format string" field is unrestricted and this field is not protected itself in any way (assumed that its value is hard-coded in the imitated application's code and not derived from the input data). For the same reason, please do not use the automated testing tools (at least with the potentially dangerous checks executing modes on). Use a locally deployed copy of this site for such kind of testing.</p>
-            </div>
+            <% if (Request.Cookies["showDisclaimer"]?.Value != "false")
+               {
+            %>
+                <div class="alert alert-dismissible alert-warning" id="disclaimer">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <h4>Warning!</h4>
+                    <p>This site mimics the behavior of a vulnerable web application that performs string formatting via <a href="https://github.com/LibProtection/libprotection-dotnet">LibProtection</a> library API to generate the arguments for the potentially vulnerable operations based on the input data.</p>
+                    <p>Therefore, don't be evil. The vulnerable operations are actually executed here. In order to give you complete freedom to test the functionality of the library, a set of the possible values of the "format string" field is unrestricted and this field is not protected itself in any way (assumed that its value is hard-coded in the imitated application's code and not derived from the input data). For the same reason, please do not use the automated testing tools (at least with the potentially dangerous checks executing modes on). Use a locally deployed copy of this site for such kind of testing.</p>
+                </div>
+            <%
+                var showDisclaimerCookie = new HttpCookie("showDisclaimer", "false");
+                Response.AppendCookie(showDisclaimerCookie);
+               }
+            %>
             <div class="form-group">
                 <h5>Language provider:</h5>
                 <select style="width:120px" class="form-control" id="grammarSelectorId"></select>
