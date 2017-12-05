@@ -16,7 +16,7 @@ The library considers each placeholder in a processed interpolated or format str
 
 ## Quick example
 
-The following code is vulnerable to injection attacks at three different points (provided that variables a, b and c contain values which were derived from the input data):
+The following code is vulnerable to injection attacks at three different points (provided that variables a, b and c contain values derived from the input data):
 
 ```
 Response.Write($"<a href='{a}' onclick='alert("{b}");return false'>{c}</a>");
