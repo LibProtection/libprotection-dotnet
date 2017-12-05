@@ -1,6 +1,6 @@
 # libprotection-dotnet
 
-**libprotection-dotnet** is a .NET version of LibProtection library — an alternative implementation of the standard functionality of the formatted and interpolated strings. It provides a realtime automatic protection from any class of the injection attacks which belong to the most attacked languages (HTML, URL, JavaScript, SQL and the file paths are currently supported).
+**libprotection-dotnet** is a .NET version of LibProtection library — an alternative implementation of the standard functionality of the formatted and interpolated strings. It provides a realtime automatic protection from any class of the injection attacks, which belong to the most attacked languages (HTML, URL, JavaScript, SQL and the file paths are currently supported).
 
 | Windows Build Status |
 |---|
@@ -11,7 +11,7 @@
 The library considers each placeholder in a processed interpolated or format string as a potentially injection point. It performs the following actions in each of these points:
 
 1. It decides a grammatical context of the possible injection (taking into account the island grammars, if necessary).
-2. If sanitization rules are defined for the given context, then it sanitizes data which belongs to the placeholder. Otherwise, data inserts as is.
+2. If sanitization rules are defined for the given context, then it sanitizes data, which belongs to the placeholder. Otherwise, data inserts as is.
 3. It performs tokenization of the input data and counting an amount of tokens. If it exceeds 1, then an attack is reported (by throwing an exception or returning a false value, depending on a used library method).
 
 ## Quick example
