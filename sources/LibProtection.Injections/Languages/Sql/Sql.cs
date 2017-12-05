@@ -30,7 +30,7 @@ namespace LibProtection.Injections
                     break;
 
                 default:
-                    throw new ArgumentException($"Unsupported JavaScript island: {context}");
+                    throw new ArgumentException($"Unsupported SQL island: {context}");
             }
 
             sanitized = null;

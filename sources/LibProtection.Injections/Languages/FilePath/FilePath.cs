@@ -19,7 +19,8 @@ namespace LibProtection.Injections
             RegexRule.Token(@":+\$[^" + DisallowedSymbols + "]+", FilePathTokenType.NTFSAttribute),
             RegexRule.Token($"[{DisallowedSymbols}]",             FilePathTokenType.DisallowedSymbol),
         };
-        public override bool TrySanitize(string text, Token context, out string sanitized)
+
+        public override bool TrySanitize(string text, Token context, out string sanitized)
         {
             sanitized = null;
             return false;
