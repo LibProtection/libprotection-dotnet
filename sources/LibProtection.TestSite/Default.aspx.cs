@@ -41,7 +41,7 @@ namespace LibProtection.TestSite
                 "Html",
                 new Example
                 {
-                    Operation = "Renders given HTML markup on the client side",
+                    Operation = "Renders the given HTML markup on the client side.",
                     FormatFunc = FormatHelper<Html>,
                     Format = "<a href='{0}' onclick='alert(\"{1}\");return false'>{2}</a>",
                     Parameters = "Default.aspx\r\nHello from embedded JavaScript code!\r\nThis site's home page",
@@ -52,7 +52,7 @@ namespace LibProtection.TestSite
                 "JavaScript",
                 new Example
                 {
-                    Operation = "Executes given JavaScript code on the client side",
+                    Operation = "Executes the given JavaScript code on the client side.",
                     FormatFunc = FormatHelper<JavaScript>,
                     Format = "operationResult.innerText = '{0}';",
                     Parameters = "Hello from internal JavaScript code!",
@@ -63,7 +63,7 @@ namespace LibProtection.TestSite
                 "Sql",
                 new Example
                 {
-                    Operation = "Executes given SQL query on the sever side and outputs its results",
+                    Operation = "Executes the given SQL query on the sever side and outputs its results.",
                     FormatFunc = FormatHelper<Sql>,
                     Format = "SELECT * FROM myTable WHERE id = {0} AND myColumn = '{1}'",
                     Parameters = "1\r\nvalue1",
@@ -74,7 +74,7 @@ namespace LibProtection.TestSite
                 "Url",
                 new Example
                 {
-                    Operation = "Uses given URL on the client side to load and execute external JavaScript code",
+                    Operation = "Uses the given URL on the client side to load and execute an external JavaScript code.",
                     FormatFunc = FormatHelper<Url>,
                     Format = "{0}/{1}",
                     Parameters = "Assets\r\njsFile.js",
@@ -85,7 +85,7 @@ namespace LibProtection.TestSite
                 "FilePath",
                 new Example
                 {
-                    Operation = "Reads content of a given local file on the server side and outputs it",
+                    Operation = "Reads content of the given local file on the server side and outputs it.",
                     FormatFunc = FormatHelper<FilePath>,
                     Format = HostingEnvironment.MapPath(@"~\Assets\{0}"),
                     Parameters = "textFile.txt",
