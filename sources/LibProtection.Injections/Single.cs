@@ -10,7 +10,7 @@ namespace LibProtection.Injections
         }
     }
 
-    internal static class Single<T> where T : class
+    public static class Single<T> where T : class
     {
         private static volatile T _instance;
         // ReSharper disable once StaticMemberInGenericType

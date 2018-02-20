@@ -1,16 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibProtection.Injections", "LibProtection.Injections\LibProtection.Injections.csproj", "{20BBA706-BA92-4B83-85D5-30E91C71BA13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibProtection.Injections", "LibProtection.Injections\LibProtection.Injections.csproj", "{EBEF0283-BEBD-40BD-9A09-4E2D80A43681}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibProtection.Injections.UnitTests", "LibProtection.Injections.UnitTests\LibProtection.Injections.UnitTests.csproj", "{F60B0DFF-E147-4BA5-BAAD-4FED5F79868A}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4B89CA8F-40D7-4F60-96C7-77D12ED3878E}"
-	ProjectSection(SolutionItems) = preProject
-		LibProtection.snk = LibProtection.snk
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibProtection.Injections.Tests", "LibProtection.Injections.Tests\LibProtection.Injections.Tests.csproj", "{023B2640-F991-4C71-8F5A-1629640F6678}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibProtection.TestSite", "LibProtection.TestSite\LibProtection.TestSite.csproj", "{477095F4-08A3-4520-B297-923E87319968}"
 EndProject
@@ -20,14 +15,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{20BBA706-BA92-4B83-85D5-30E91C71BA13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{20BBA706-BA92-4B83-85D5-30E91C71BA13}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{20BBA706-BA92-4B83-85D5-30E91C71BA13}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{20BBA706-BA92-4B83-85D5-30E91C71BA13}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F60B0DFF-E147-4BA5-BAAD-4FED5F79868A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F60B0DFF-E147-4BA5-BAAD-4FED5F79868A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F60B0DFF-E147-4BA5-BAAD-4FED5F79868A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F60B0DFF-E147-4BA5-BAAD-4FED5F79868A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBEF0283-BEBD-40BD-9A09-4E2D80A43681}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBEF0283-BEBD-40BD-9A09-4E2D80A43681}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBEF0283-BEBD-40BD-9A09-4E2D80A43681}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBEF0283-BEBD-40BD-9A09-4E2D80A43681}.Release|Any CPU.Build.0 = Release|Any CPU
+		{023B2640-F991-4C71-8F5A-1629640F6678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{023B2640-F991-4C71-8F5A-1629640F6678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{023B2640-F991-4C71-8F5A-1629640F6678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{023B2640-F991-4C71-8F5A-1629640F6678}.Release|Any CPU.Build.0 = Release|Any CPU
 		{477095F4-08A3-4520-B297-923E87319968}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{477095F4-08A3-4520-B297-923E87319968}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{477095F4-08A3-4520-B297-923E87319968}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -37,6 +32,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {B09DA113-A177-4529-B2DD-BC5D62AE635E}
+		SolutionGuid = {D29404FF-D3C4-4BCF-AFA4-856A44C8AA35}
 	EndGlobalSection
 EndGlobal

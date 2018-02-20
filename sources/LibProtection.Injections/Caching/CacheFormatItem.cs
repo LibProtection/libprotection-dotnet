@@ -1,26 +1,33 @@
-﻿namespace LibProtection.Injections.Caching
+﻿namespace LibProtection.Injections
 {
-    public struct CacheFormatItem
+    public struct FormatCacheItem
     {
-        public string Format;
-        public object[] Args;
+        public readonly string Format;
+        public readonly object[] Args;
+
+        public FormatCacheItem(string format, object[] args)
+        {
+            Format = format;
+            Args = args;
+        }
 
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is CacheFormatItem) || this.GetHashCode() != obj.GetHashCode()) { return false; }
+            if (!(obj is FormatCacheItem) || GetHashCode() != obj.GetHashCode()) { return false; }
 
-            var that = (CacheFormatItem)obj;
+            var that = (FormatCacheItem)obj;
 
-            if (!Equals(this.Format, that.Format)) { return false; }
+            if (!Equals(Format, that.Format)) { return false; }
 
-            if (this.Args == null && that.Args != null) { return false; }
-            if (this.Args != null && that.Args == null) { return false; }
+            if (Args == null && that.Args != null) { return false; }
+            if (Args != null && that.Args == null) { return false; }
             if (that.Args == null) { return true; }
-            if (this.Args.Length != that.Args.Length) { return false; }
-            for (int i = 0; i < this.Args.Length; i++)
+            if (Args.Length != that.Args.Length) { return false; }
+            for (int i = 0; i < Args.Length; i++)
             {
-                if (!Equals(this.Args[i], that.Args[i])) { return false; }
+                if (!Equals(Args[i], that.Args[i])) { return false; }
             }
+
             return true;
         }
 
@@ -29,10 +36,10 @@
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + this.Format != null ? this.Format.GetHashCode() : 0;
-                if (this.Args != null)
+                hash = hash * 23 + (Format != null ? Format.GetHashCode() : 0);
+                if (Args != null)
                 {
-                    for (int i = 0; i < this.Args.Length; i++)
+                    for (int i = 0; i < Args.Length; i++)
                     {
                         hash = hash * 23 + (Args[i] != null ? Args[i].GetHashCode() : 0);
                     }

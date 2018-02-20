@@ -64,7 +64,7 @@
             <asp:ContentPlaceHolder ID="MainContent" runat="server">
             </asp:ContentPlaceHolder>
             <footer>
-                <p style="text-align: center;">© <%= DateTime.Now.Year %>, Libprotection <a href="https://github.com/orgs/LibProtection/people">Team</a></p>
+                <p style="text-align: center;">© 2017-<%= DateTime.Now.Year %>, Libprotection <a href="https://github.com/orgs/LibProtection/people">Team</a></p>
             </footer>
         </div>
     </form>

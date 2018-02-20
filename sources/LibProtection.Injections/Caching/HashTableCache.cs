@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace LibProtection.Injections.Caching
+namespace LibProtection.Injections
 {
-    internal sealed class HashTableCache<TKey, TValue>
+    internal sealed class HashTableCache<TKey, TValue> : ICache<TKey, TValue>
     {
         private class CacheRecord
         {
@@ -17,15 +17,17 @@ namespace LibProtection.Injections.Caching
 
         public HashTableCache(int capacity, IEqualityComparer<TKey> comparer = null)
         {
-            this._cache = new CacheRecord[capacity];
-            this._comparer = comparer ?? EqualityComparer<TKey>.Default;
+            _cache = new CacheRecord[capacity];
+            _comparer = comparer ?? EqualityComparer<TKey>.Default;
         }
 
         public TValue Get(TKey key, Func<TKey, TValue> factory)
         {
             var hashCode = unchecked((uint)_comparer.GetHashCode(key));
             var index = hashCode % _cache.Length;
-            var record = Volatile.Read(ref _cache[index]);
+            var record = _cache[index];
+            Thread.MemoryBarrier();
+
             if (record == null || !_comparer.Equals(record.Key, key))
             {
                 record = new CacheRecord
@@ -33,8 +35,11 @@ namespace LibProtection.Injections.Caching
                     Key = key,
                     Value = factory(key),
                 };
-                Volatile.Write(ref _cache[index], record);
+
+                Thread.MemoryBarrier();
+                _cache[index] = record;
             }
+
             return record.Value;
         }
     }
