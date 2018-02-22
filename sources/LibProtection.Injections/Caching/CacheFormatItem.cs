@@ -1,4 +1,6 @@
-﻿namespace LibProtection.Injections
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace LibProtection.Injections
 {
     public struct FormatCacheItem
     {
@@ -11,21 +13,22 @@
             Args = args;
         }
 
+        [SuppressMessage("ReSharper", "ArrangeThisQualifier")]
         public override bool Equals(object obj)
         {
             if (!(obj is FormatCacheItem) || GetHashCode() != obj.GetHashCode()) { return false; }
 
             var that = (FormatCacheItem)obj;
 
-            if (!Equals(Format, that.Format)) { return false; }
+            if (!Equals(this.Format, that.Format)) { return false; }
 
-            if (Args == null && that.Args != null) { return false; }
-            if (Args != null && that.Args == null) { return false; }
+            if (this.Args == null && that.Args != null) { return false; }
+            if (this.Args != null && that.Args == null) { return false; }
             if (that.Args == null) { return true; }
-            if (Args.Length != that.Args.Length) { return false; }
-            for (int i = 0; i < Args.Length; i++)
+            if (this.Args.Length != that.Args.Length) { return false; }
+            for (int i = 0; i < this.Args.Length; i++)
             {
-                if (!Equals(Args[i], that.Args[i])) { return false; }
+                if (!Equals(this.Args[i], that.Args[i])) { return false; }
             }
 
             return true;

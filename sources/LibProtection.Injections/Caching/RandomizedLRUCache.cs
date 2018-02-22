@@ -6,7 +6,7 @@ using System.Threading;
 namespace LibProtection.Injections
 {
     // ReSharper disable once InconsistentNaming
-    internal sealed class RandomizedLRUCache<TKey, TValue> : ICache<TKey, TValue>
+    internal sealed class RandomizedLRUCache<TKey, TValue>
     {
         private class CacheRecord
         {

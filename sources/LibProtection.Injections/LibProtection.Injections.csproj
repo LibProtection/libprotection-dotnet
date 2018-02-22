@@ -1,28 +1,24 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netcoreapp2.0;net40;net461</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\LibProtection.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-
   <PropertyGroup>
     <Antlr4UseCSharpGenerator>True</Antlr4UseCSharpGenerator>
     <Authors>Vladimir Kochetkov, Igor Yakovlev</Authors>
-    <Copyright>LibProtection Team</Copyright>
+    <Copyright>© 2017-2018, LibProtection Team</Copyright>
     <PackageProjectUrl>http://libprotection.org</PackageProjectUrl>
     <RepositoryUrl>https://github.com/LibProtection/libprotection-dotnet</RepositoryUrl>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Version>0.0.0.0</Version>
   </PropertyGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'net461' OR '$(TargetFramework)' == 'net40'">
     <Reference Include="System.Web" />
   </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
-      <Compile Remove="SafeString.Formattable.cs" />
+    <Compile Remove="SafeString.Formattable.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <Antlr4 Include="..\..\submodules\libprotection-common\grammars\HTMLLexer.g4" Link="Languages\Html\HTMLLexer.g4">
       <Generator>MSBuild:Compile</Generator>
@@ -43,9 +39,7 @@
       <Visitor>False</Visitor>
     </Antlr4>
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Antlr4" Version="4.6.5-beta001" />
   </ItemGroup>
-
 </Project>

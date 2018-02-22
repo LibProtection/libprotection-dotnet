@@ -8,7 +8,7 @@ namespace LibProtection.Injections
     internal class FormatProvider<T> : IFormatProvider where T: LanguageProvider
     {
         // ReSharper disable once StaticMemberInGenericType
-        private static volatile ICache<FormatCacheItem, Option<string>> _cache
+        private static readonly RandomizedLRUCache<FormatCacheItem, Option<string>> Cache
             = new RandomizedLRUCache<FormatCacheItem, Option<string>>(1024);
 
         private readonly Formatter<T> _formatter;
@@ -32,7 +32,7 @@ namespace LibProtection.Injections
         public static bool TryFormat(string format, out string formatted, object[] args)
         {
             var keyItem = new FormatCacheItem(format, args);
-            var cacheOption = _cache?.Get(keyItem, TryFormatInternal) ?? TryFormatInternal(keyItem);
+            var cacheOption = Cache.Get(keyItem, TryFormatInternal);
             formatted = cacheOption.Value;
             return cacheOption.HasValue;
         }
