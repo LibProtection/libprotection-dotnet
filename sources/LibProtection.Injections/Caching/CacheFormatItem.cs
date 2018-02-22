@@ -1,15 +1,24 @@
-﻿namespace LibProtection.Injections.Caching
-{
-    public struct CacheFormatItem
-    {
-        public string Format;
-        public object[] Args;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace LibProtection.Injections
+{
+    public struct FormatCacheItem
+    {
+        public readonly string Format;
+        public readonly object[] Args;
+
+        public FormatCacheItem(string format, object[] args)
+        {
+            Format = format;
+            Args = args;
+        }
+
+        [SuppressMessage("ReSharper", "ArrangeThisQualifier")]
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is CacheFormatItem) || this.GetHashCode() != obj.GetHashCode()) { return false; }
+            if (!(obj is FormatCacheItem) || GetHashCode() != obj.GetHashCode()) { return false; }
 
-            var that = (CacheFormatItem)obj;
+            var that = (FormatCacheItem)obj;
 
             if (!Equals(this.Format, that.Format)) { return false; }
 
@@ -21,6 +30,7 @@
             {
                 if (!Equals(this.Args[i], that.Args[i])) { return false; }
             }
+
             return true;
         }
 
@@ -29,10 +39,10 @@
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + this.Format != null ? this.Format.GetHashCode() : 0;
-                if (this.Args != null)
+                hash = hash * 23 + (Format != null ? Format.GetHashCode() : 0);
+                if (Args != null)
                 {
-                    for (int i = 0; i < this.Args.Length; i++)
+                    for (int i = 0; i < Args.Length; i++)
                     {
                         hash = hash * 23 + (Args[i] != null ? Args[i].GetHashCode() : 0);
                     }

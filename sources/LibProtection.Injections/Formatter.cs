@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace LibProtection.Injections
 {
-    internal class Formatter : ICustomFormatter
+    internal class Formatter<T> : ICustomFormatter where T: LanguageProvider
     {
         private readonly char _complementaryChar;
 
@@ -14,7 +14,7 @@ namespace LibProtection.Injections
 
         public string Format(string format, object arg, IFormatProvider formatProvider)
         {
-            if (!(formatProvider is FormatProvider provider))
+            if (!(formatProvider is FormatProvider<T> provider))
             {
                 throw new FormatException($"Invalid format provider: {formatProvider}");
             }

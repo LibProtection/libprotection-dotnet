@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 
-namespace LibProtection.Injections.UnitTests
+namespace LibProtection.Injections.Tests
 {
     [TestFixture]
     public class TokenizationTests
@@ -113,16 +113,11 @@ namespace LibProtection.Injections.UnitTests
 
                 return true;
             }
-            else
-            {
-                Debug.Assert(false, $"{tokensFileName} file is missed. Press skip to generate it.");
-                // ReSharper disable once HeuristicUnreachableCode
-                File.WriteAllLines(tokensFileName, obtainedTokens);
-                return true;
-            }
 
-
-            return false;
+            Debug.Assert(false, $"{tokensFileName} file is missed. Press skip to generate it.");
+            // ReSharper disable once HeuristicUnreachableCode
+            File.WriteAllLines(tokensFileName, obtainedTokens);
+            return true;
         }
 
         private static string EscapeNewLine(string s)

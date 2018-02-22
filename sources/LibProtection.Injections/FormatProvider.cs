@@ -1,47 +1,22 @@
-﻿using LibProtection.Injections.Caching;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
 namespace LibProtection.Injections
 {
-    internal class FormatProvider : IFormatProvider
+    internal class FormatProvider<T> : IFormatProvider where T: LanguageProvider
     {
-        private readonly Formatter _formatter;
+        // ReSharper disable once StaticMemberInGenericType
+        private static readonly RandomizedLRUCache<FormatCacheItem, Option<string>> Cache
+            = new RandomizedLRUCache<FormatCacheItem, Option<string>>(1024);
+
+        private readonly Formatter<T> _formatter;
         private readonly List<Fragment> _formattedFragments = new List<Fragment>();
 
         private FormatProvider(char complementaryChar)
         {
-            _formatter = new Formatter(complementaryChar);
-        }
-
-        private static class GenericHolder<T> where T : LanguageProvider
-        {
-            // ReSharper disable once StaticMemberInGenericType
-            public static volatile RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)> Instance
-                = new RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)>(1024);
-
-            // ReSharper disable once StaticMemberInGenericType
-            public static volatile ICustomCache CustomCache;
-
-            public static Func<CacheFormatItem, (bool Success, string ResultValue)> TryFormatDelegate { get; } =
-                TryFormatInternal<T>;
-        }
-
-        public static void SetCustomCache<T>(ICustomCache customCache) where T : LanguageProvider
-            => GenericHolder<T>.CustomCache = customCache;
-
-        public static void SetDefaultCacheSize<T>(int cacheTableSize) where T : LanguageProvider
-        {
-            if (cacheTableSize < 0)
-            {
-                throw new ArgumentException($"{nameof(cacheTableSize)} argument of {nameof(SetDefaultCacheSize)} method should be greater or equal to zero!");
-            }
-
-            GenericHolder<T>.Instance = (cacheTableSize != 0)
-                ? GenericHolder<T>.Instance = new RandomizedLRUCache<CacheFormatItem, (bool Success, string ResultValue)>(cacheTableSize)
-                : null;
+            _formatter = new Formatter<T>(complementaryChar);
         }
 
         public object GetFormat(Type formatType)
@@ -54,48 +29,21 @@ namespace LibProtection.Injections
             _formattedFragments.Add(fragment);
         }
 
-        public static bool TryFormat<T>(string format, out string formatted, object[] args)
-            where T : LanguageProvider
+        public static bool TryFormat(string format, out string formatted, object[] args)
         {
-            var keyItem = new CacheFormatItem
-            {
-                Format = format,
-                Args = args,
-            };
-
-            var customCache = GenericHolder<T>.CustomCache;
-            if (customCache != null)
-            {
-                if (customCache.Get(keyItem, out var formatSuccess, out var formatResult))
-                {
-                    formatted = formatResult;
-                    return formatSuccess;
-                }
-
-                (formatSuccess, formatResult) = TryFormatInternal<T>(keyItem);
-                customCache.Add(keyItem, formatSuccess, formatResult);
-                formatted = formatResult;
-                return formatSuccess;
-            }
-
-            var lruCache = GenericHolder<T>.Instance;
-
-            var (success, resultValue) = (lruCache != null)
-                ? GenericHolder<T>.Instance.Get(keyItem, GenericHolder<T>.TryFormatDelegate)
-                : TryFormatInternal<T>(keyItem);
-
-            formatted = resultValue;
-            return success;
+            var keyItem = new FormatCacheItem(format, args);
+            var cacheOption = Cache.Get(keyItem, TryFormatInternal);
+            formatted = cacheOption.Value;
+            return cacheOption.HasValue;
         }
 
-        private static (bool Success, string ResultValue) TryFormatInternal<T>(CacheFormatItem formatItem)
-            where T : LanguageProvider
+        private static Option<string> TryFormatInternal(FormatCacheItem formatItem)
         {
             var format = formatItem.Format;
             var args = formatItem.Args;
 
             var complementaryChar = format.GetComplementaryChar();
-            var formatProvider = new FormatProvider(complementaryChar);
+            var formatProvider = new FormatProvider<T>(complementaryChar);
             var formattedBuilder = new StringBuilder(string.Format(formatProvider, format, args));
             var taintedRanges = new List<Range>();
             var currentCharIndex = 0;
@@ -128,12 +76,9 @@ namespace LibProtection.Injections
 
             var formatted = formattedBuilder.ToString();
 
-            if (LanguageService<T>.TrySanitize(formatted, taintedRanges, out var sanitized))
-            {
-                return (true, sanitized);
-            }
-
-            return (false, null);
+            return LanguageService<T>.TrySanitize(formatted, taintedRanges, out var sanitized)
+                ? new Option<string>(sanitized)
+                : Option<string>.None;
         }
     }
 }

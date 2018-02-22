@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace LibProtection.Injections
@@ -70,7 +69,7 @@ namespace LibProtection.Injections
             return true;
         }
 
-        private static IEnumerable<TokenScope> GetTokensScopes(IEnumerable<Token> tokens, IReadOnlyCollection<Range> ranges)
+        private static IEnumerable<TokenScope> GetTokensScopes(IEnumerable<Token> tokens, List<Range> ranges)
         {
             var scopesMap = new Dictionary<Range, TokenScope>();
 
