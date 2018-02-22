@@ -11,4 +11,4 @@ if not exist %msbuild% (
     set msbuild="%vs2017dir%\Professional\MSBuild\15.0\Bin\MSBuild.exe"
 )
 
-%msbuild% ..\sources\LibProtection.TestSite\LibProtection.TestSite.csproj /t:Rebuild /p:Configuration=Release
+%msbuild% ..\sources\LibProtection.TestSite\LibProtection.TestSite.csproj /t:Rebuild /p:Configuration=Release /p:Platform=AnyCPU
