@@ -16,6 +16,9 @@
     <AssemblyVersion>0.0.0</AssemblyVersion>
     <FileVersion>0.0.0</FileVersion>
     <InformationalVersion>0.0.0</InformationalVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Libprotection.NET is a .NET version of LibProtection library — an alternative implementation of the standard functionality of the formatted and interpolated strings. It provides a realtime automatic protection from any class of the injection attacks, which belong to the most attacked languages (HTML, URL, JavaScript, SQL and the file paths are currently supported).</Description>
+    <PackageTags>injections, html, javascript, sql, path, url</PackageTags>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net461' OR '$(TargetFramework)' == 'net40'">
     <Reference Include="System.Web" />
