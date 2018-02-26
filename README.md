@@ -8,7 +8,7 @@ This project is in the state of early beta. It is stable enough for the public t
 
 | Windows Build Status |
 |---|
-|[![Build status](https://ci.appveyor.com/api/projects/status/d4jggt3p10bvbxik/branch/dev?svg=true)](https://ci.appveyor.com/project/libprotection/libprotection-dotnet/branch/dev)|
+|[![Build status](https://ci.appveyor.com/api/projects/status/8y9t294ypeuu18rs/branch/dev?svg=true)](https://ci.appveyor.com/project/libprotection/libprotection-dotnet/branch/dev)|
 
 ## How it works
 
