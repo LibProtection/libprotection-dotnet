@@ -33,14 +33,14 @@ deploy:
     secure: 3GE8WSLpA3xAcl45sHIDdZy5n8hRNvmHWbCUs2V5gCyfzY9twjOFgcXGoZygrV6b
   artifact: packages
   on:
-    branch: dev
+    branch: release
 - provider: GitHub
   auth_token:
     secure: XeMjiYrdCvXExNd4Mp+XNxl/DMo+IyGK/sa7ayNMXfNL63lbujqGaqxXH+yoUNCa
   repository: LibProtection/libprotection-dotnet
   artifact: binaries
   on:
-    branch: dev
+    branch: release
 notifications:
 - provider: Email
   to:
