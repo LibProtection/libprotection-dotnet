@@ -1,4 +1,5 @@
 version: 0.10.{build}
+skip_tags: true
 image: Visual Studio 2017
 init:
 - cmd: git config --global core.autocrlf false
