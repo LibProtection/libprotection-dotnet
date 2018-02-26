@@ -1,4 +1,4 @@
-version: 0.10.{build}
+version: 0.11.{build}
 skip_tags: true
 image: Visual Studio 2017
 init:
@@ -10,7 +10,7 @@ dotnet_csproj:
   package_version: '{version}'
   assembly_version: '{version}'
   file_version: '{version}'
-  informational_version: '{version}'
+  informational_version: '{version}-beta'
 install:
 - cmd: git submodule update --init --recursive
 build_script:
@@ -33,14 +33,15 @@ deploy:
     secure: 3GE8WSLpA3xAcl45sHIDdZy5n8hRNvmHWbCUs2V5gCyfzY9twjOFgcXGoZygrV6b
   artifact: packages
   on:
-    branch: release
+    branch: dev
 - provider: GitHub
   auth_token:
     secure: XeMjiYrdCvXExNd4Mp+XNxl/DMo+IyGK/sa7ayNMXfNL63lbujqGaqxXH+yoUNCa
   repository: LibProtection/libprotection-dotnet
   artifact: binaries
+  prerelease: true
   on:
-    branch: release
+    branch: dev
 notifications:
 - provider: Email
   to:
