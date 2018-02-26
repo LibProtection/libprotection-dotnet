@@ -136,8 +136,9 @@ namespace LibProtection.Injections.Tests
 
         private static IEnumerable TestCases(string languageName)
         {
-            var casesDirectory =
-                Path.Combine(TestContext.CurrentContext.TestDirectory, "TestCases\\tokenization");
+            var casesDirectory = Path.Combine(
+                Path.GetDirectoryName(new Uri(typeof(TokenizationTests).Assembly.CodeBase).LocalPath),
+                "TestCases\\tokenization");
 
             foreach (var fileName in Directory.GetFiles(casesDirectory, $"*.{languageName}"))
             {
