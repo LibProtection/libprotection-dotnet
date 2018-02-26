@@ -1,1 +1,49 @@
-﻿version: 0.10.{build}
+version: 0.0.{build}
+image: Visual Studio 2017
+init:
+- cmd: git config --global core.autocrlf false
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+install:
+- cmd: git submodule update --init --recursive
+build_script:
+- cmd: >-
+    dotnet --info
+
+    dotnet restore sources\LibProtection.Injections
+
+    dotnet build -c Release sources\LibProtection.Injections
+after_test:
+- cmd: 7z a -r sources\LibProtection.Injections\LibProtection.Injections\bin\Release\LibProtection-%APPVEYOR_BUILD_VERSION%.zip sources\LibProtection.Injections\LibProtection.Injections\bin\Release\*.dll sources\LibProtection.Injections\LibProtection.Injections\bin\Release\*.xml
+artifacts:
+- path: sources\LibProtection.Injections\LibProtection.Injections\bin\Release\*.zip
+  name: binaries
+- path: sources\LibProtection.Injections\LibProtection.Injections\bin\Release\*.nupkg
+  name: packages
+deploy:
+- provider: NuGet
+  api_key:
+    secure: 3GE8WSLpA3xAcl45sHIDdZy5n8hRNvmHWbCUs2V5gCyfzY9twjOFgcXGoZygrV6b
+  artifact: packages
+  on:
+    branch: dev
+- provider: GitHub
+  auth_token:
+    secure: XeMjiYrdCvXExNd4Mp+XNxl/DMo+IyGK/sa7ayNMXfNL63lbujqGaqxXH+yoUNCa
+  repository: LibProtection/libprotection-dotnet
+  artifact: binaries
+  on:
+    branch: dev
+notifications:
+- provider: Email
+  to:
+  - libprotection@outlook.com
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
