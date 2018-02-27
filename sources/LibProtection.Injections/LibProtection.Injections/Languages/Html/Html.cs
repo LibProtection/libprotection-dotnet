@@ -22,7 +22,7 @@ namespace LibProtection.Injections
         private readonly HashSet<string> _htmlUrlAttributes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             "href", "src", "manifest", "poster", "code", "codebase", "data", "xlink:href", "xml:base", "from", "to",
-            "formaction", "action"
+            "formaction", "action", "dynsrc", "lowsrc"
         };
 
         private Html() { }
