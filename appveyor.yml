@@ -33,7 +33,7 @@ deploy:
     secure: 3GE8WSLpA3xAcl45sHIDdZy5n8hRNvmHWbCUs2V5gCyfzY9twjOFgcXGoZygrV6b
   artifact: packages
   on:
-    branch: dev
+    branch: master
 - provider: GitHub
   auth_token:
     secure: XeMjiYrdCvXExNd4Mp+XNxl/DMo+IyGK/sa7ayNMXfNL63lbujqGaqxXH+yoUNCa
@@ -41,7 +41,7 @@ deploy:
   artifact: binaries
   prerelease: true
   on:
-    branch: dev
+    branch: master
 notifications:
 - provider: Email
   to:
