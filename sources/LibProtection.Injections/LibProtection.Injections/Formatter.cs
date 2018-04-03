@@ -3,6 +3,12 @@ using System.Globalization;
 
 namespace LibProtection.Injections
 {
+    internal class ArgumentWrapper
+    {
+        public object Argument { get; set; }
+        public int Index { get; set; }
+    }
+
     internal class Formatter<T> : ICustomFormatter where T: LanguageProvider
     {
         private readonly char _complementaryChar;
@@ -12,12 +18,15 @@ namespace LibProtection.Injections
             _complementaryChar = complementaryChar;
         }
 
-        public string Format(string format, object arg, IFormatProvider formatProvider)
+        public string Format(string format, object argumentWrapperObj, IFormatProvider formatProvider)
         {
             if (!(formatProvider is FormatProvider<T> provider))
             {
                 throw new FormatException($"Invalid format provider: {formatProvider}");
             }
+
+            var argumentWrapper = (ArgumentWrapper)argumentWrapperObj;
+            var arg = argumentWrapper.Argument;
 
             bool isSafe = false;
             string formattedValue = null;
@@ -56,7 +65,7 @@ namespace LibProtection.Injections
             if (formattedValue == null) { formattedValue = arg.ToString(); }
             
             provider.AddFragment(
-                new Fragment(formattedValue, isSafe)
+                new Fragment(formattedValue, isSafe, argumentWrapper.Index)
             );
 
             return new string(_complementaryChar, formattedValue.Length);

@@ -16,7 +16,7 @@ namespace LibProtection.Injections
 
         public static bool TryFormat(FormattableString formattable, out string formatted)
         {
-            return FormatProvider<T>.TryFormat(formattable.Format, out formatted, formattable.GetArguments());
+            return TryFormat(formattable.Format, out formatted, formattable.GetArguments());
         }
     }
 }

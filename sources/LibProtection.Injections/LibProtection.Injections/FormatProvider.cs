@@ -7,9 +7,15 @@ namespace LibProtection.Injections
 {
     internal class FormatProvider<T> : IFormatProvider where T: LanguageProvider
     {
+        private class RangeForArgumentIndex
+        {
+            public int Index { get; set; }
+            public Range Range { get; set; }
+        }
+
         // ReSharper disable once StaticMemberInGenericType
-        private static readonly RandomizedLRUCache<FormatCacheItem, Option<string>> Cache
-            = new RandomizedLRUCache<FormatCacheItem, Option<string>>(1024);
+        private static readonly RandomizedLRUCache<FormatCacheItem, FormatResult> Cache
+            = new RandomizedLRUCache<FormatCacheItem, FormatResult>(1024);
 
         private readonly Formatter<T> _formatter;
         private readonly List<Fragment> _formattedFragments = new List<Fragment>();
@@ -29,23 +35,34 @@ namespace LibProtection.Injections
             _formattedFragments.Add(fragment);
         }
 
-        public static bool TryFormat(string format, out string formatted, object[] args)
+        public static FormatResult TryFormat(string format, object[] args)
         {
             var keyItem = new FormatCacheItem(format, args);
             var cacheOption = Cache.Get(keyItem, TryFormatInternal);
-            formatted = cacheOption.Value;
-            return cacheOption.HasValue;
+            return cacheOption;
         }
 
-        private static Option<string> TryFormatInternal(FormatCacheItem formatItem)
+        private static FormatResult TryFormatInternal(FormatCacheItem formatItem)
         {
             var format = formatItem.Format;
             var args = formatItem.Args;
 
             var complementaryChar = format.GetComplementaryChar();
             var formatProvider = new FormatProvider<T>(complementaryChar);
-            var formattedBuilder = new StringBuilder(string.Format(formatProvider, format, args));
+            //wrap arguments to memorize argument index
+            var wrappedArguments = new ArgumentWrapper[args.Length];
+            for(int i = 0; i < args.Length; i++)
+            {
+                wrappedArguments[i] = new ArgumentWrapper
+                {
+                    Argument = args[i],
+                    Index = i,
+                };
+            }
+            
+            var formattedBuilder = new StringBuilder(string.Format(formatProvider, format, wrappedArguments));
             var taintedRanges = new List<Range>();
+            var argumentRanges = new List<RangeForArgumentIndex>();
             var currentCharIndex = 0;
             var currentFragmentIndex = 0;
             
@@ -65,7 +82,15 @@ namespace LibProtection.Injections
                     }
 
                     var upperBound = currentCharIndex - 1;
-                    if (!currentFragment.IsSafe) { taintedRanges.Add(new Range(lowerBound, upperBound)); }
+                    if (!currentFragment.IsSafe) {
+                        var currentRange = new Range(lowerBound, upperBound);
+                        taintedRanges.Add(currentRange);
+                        argumentRanges.Add(new RangeForArgumentIndex
+                        {
+                            Index = currentFragment.FragmentArgumentIndex,
+                            Range = currentRange,
+                        });
+                    }
                     currentFragmentIndex++;
                 }
                 else
@@ -76,9 +101,17 @@ namespace LibProtection.Injections
 
             var formatted = formattedBuilder.ToString();
 
-            return LanguageService<T>.TrySanitize(formatted, taintedRanges, out var sanitized)
-                ? new Option<string>(sanitized)
-                : Option<string>.None;
+            var sanitizeResult = LanguageService<T>.TrySanitize(formatted, taintedRanges);
+            if (sanitizeResult.Success)
+            {
+                return FormatResult.Success(sanitizeResult.Tokens, sanitizeResult.SanitizedText);
+            }
+            else
+            {
+                var attackArgument = argumentRanges.Find(argumentRange => argumentRange.Range.Overlaps(sanitizeResult.AttackToken.Range));
+                Debug.Assert(attackArgument != null, "Cannot find attack argument for attack token.");
+                return FormatResult.Fail(sanitizeResult.Tokens, attackArgument.Index);
+            }
         }
     }
 }
