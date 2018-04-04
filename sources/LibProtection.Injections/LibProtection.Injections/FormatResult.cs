@@ -1,8 +1,10 @@
-﻿namespace LibProtection.Injections
+﻿using System.Collections.Generic;
+
+namespace LibProtection.Injections
 {
     internal struct FormatResult
     {
-        private FormatResult(Token[] tokens, bool isAttackDetected, int injectionPointIndex, string formattedString)
+        public FormatResult(Token[] tokens, bool isAttackDetected, int injectionPointIndex, string formattedString)
         {
             Tokens = tokens;
             IsAttackDetected = isAttackDetected;
@@ -15,6 +17,31 @@
 
         public static FormatResult Fail(Token[] tokens, int injectionPointIndex)
             => new FormatResult(tokens, true, injectionPointIndex, null);
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is FormatResult))
+            {
+                return false;
+            }
+
+            var result = (FormatResult)obj;
+            return Extensions.ArrayExtensions.ArraysEqual(Tokens, result.Tokens) &&
+                   IsAttackDetected == result.IsAttackDetected &&
+                   InjectionPointIndex == result.InjectionPointIndex &&
+                   FormattedString == result.FormattedString;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = -80248532;
+            hashCode = hashCode * -1521134295 + base.GetHashCode();
+            hashCode = hashCode * -1521134295 + Extensions.ArrayExtensions.ArrayGetHashCode(Tokens);
+            hashCode = hashCode * -1521134295 + IsAttackDetected.GetHashCode();
+            hashCode = hashCode * -1521134295 + InjectionPointIndex.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FormattedString);
+            return hashCode;
+        }
 
         /// <summary>
         /// array of tokenization artifacts
