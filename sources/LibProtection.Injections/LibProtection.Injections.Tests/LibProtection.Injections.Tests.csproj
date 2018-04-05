@@ -20,14 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="..\..\..\submodules\libprotection-common\test-cases\tokenization\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="..\..\..\submodules\libprotection-common\test-cases\formatCases\qqq.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\LibProtection.Injections\LibProtection.Injections.csproj" />
   </ItemGroup>
 

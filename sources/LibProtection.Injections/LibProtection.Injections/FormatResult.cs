@@ -35,11 +35,14 @@ namespace LibProtection.Injections
         public override int GetHashCode()
         {
             var hashCode = -80248532;
-            hashCode = hashCode * -1521134295 + base.GetHashCode();
-            hashCode = hashCode * -1521134295 + Extensions.ArrayExtensions.ArrayGetHashCode(Tokens);
-            hashCode = hashCode * -1521134295 + IsAttackDetected.GetHashCode();
-            hashCode = hashCode * -1521134295 + InjectionPointIndex.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FormattedString);
+            unchecked
+            {
+                hashCode = hashCode * -1521134295 + base.GetHashCode();
+                hashCode = hashCode * -1521134295 + Extensions.ArrayExtensions.ArrayGetHashCode(Tokens);
+                hashCode = hashCode * -1521134295 + IsAttackDetected.GetHashCode();
+                hashCode = hashCode * -1521134295 + InjectionPointIndex.GetHashCode();
+                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(FormattedString);
+            }
             return hashCode;
         }
 

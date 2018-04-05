@@ -29,7 +29,7 @@ namespace LibProtection.Injections.Extensions
 
             for(int i = 0; i < a.Length; i++)
             {
-                hashCode = hashCode * -1521134295 + a[i].GetHashCode();
+                hashCode = unchecked (hashCode * -1521134295 + a[i].GetHashCode());
             }
             return hashCode;
         }

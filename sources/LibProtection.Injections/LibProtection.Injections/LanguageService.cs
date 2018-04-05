@@ -89,7 +89,6 @@ namespace LibProtection.Injections
                 scopesCount++;
                 allTrivial &= scope.IsTrivial;
                 if ((scope.Tokens.Count > 1 ||  scopesCount > 1) && !allTrivial) {
-
                     attackToken = scope.Tokens.Find(token => !token.IsTrivial);
                     return false;
                 }
