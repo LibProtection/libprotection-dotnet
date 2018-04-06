@@ -1,6 +1,6 @@
-﻿namespace LibProtection.Injections
+﻿namespace LibProtection.Injections.Formatting
 {
-    internal class Fragment
+    class Fragment
     {
         public string FormattedValue { get; }
         public bool IsSafe { get; }

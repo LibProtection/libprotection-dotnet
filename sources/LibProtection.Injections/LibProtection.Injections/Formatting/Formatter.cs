@@ -3,26 +3,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace LibProtection.Injections
+namespace LibProtection.Injections.Formatting
 {
-    internal class FormatProvider<T> : IFormatProvider where T: LanguageProvider
+    internal class Formatter : IFormatProvider
     {
-        private class RangeForArgumentIndex
-        {
-            public int Index { get; set; }
-            public Range Range { get; set; }
-        }
-
-        // ReSharper disable once StaticMemberInGenericType
-        private static readonly RandomizedLRUCache<FormatCacheItem, FormatResult> Cache
-            = new RandomizedLRUCache<FormatCacheItem, FormatResult>(1024);
-
-        private readonly Formatter<T> _formatter;
+        private readonly ComplementaryFormatter _formatter;
         private readonly List<Fragment> _formattedFragments = new List<Fragment>();
 
-        private FormatProvider(char complementaryChar)
+        private Formatter(char complementaryChar)
         {
-            _formatter = new Formatter<T>(complementaryChar);
+            _formatter = new ComplementaryFormatter(complementaryChar);
         }
 
         public object GetFormat(Type formatType)
@@ -35,20 +25,13 @@ namespace LibProtection.Injections
             _formattedFragments.Add(fragment);
         }
 
-        public static FormatResult TryFormat(string format, object[] args)
+        public static string Format(string format, object[] args, out List<Range> taintedRanges, out List<int> associatedToRangeIndexes)
         {
-            var keyItem = new FormatCacheItem(format, args);
-            var cacheOption = Cache.Get(keyItem, TryFormatInternal);
-            return cacheOption;
-        }
-
-        private static FormatResult TryFormatInternal(FormatCacheItem formatItem)
-        {
-            var format = formatItem.Format;
-            var args = formatItem.Args;
+            taintedRanges = new List<Range>();
+            associatedToRangeIndexes = new List<int>();
 
             var complementaryChar = format.GetComplementaryChar();
-            var formatProvider = new FormatProvider<T>(complementaryChar);
+            var formatProvider = new Formatter(complementaryChar);
             //wrap arguments to memorize argument index
             var wrappedArguments = new ArgumentWrapper[args.Length];
             for(int i = 0; i < args.Length; i++)
@@ -61,8 +44,6 @@ namespace LibProtection.Injections
             }
             
             var formattedBuilder = new StringBuilder(string.Format(formatProvider, format, wrappedArguments));
-            var taintedRanges = new List<Range>();
-            var argumentRanges = new List<RangeForArgumentIndex>();
             var currentCharIndex = 0;
             var currentFragmentIndex = 0;
             
@@ -85,11 +66,7 @@ namespace LibProtection.Injections
                     if (!currentFragment.IsSafe) {
                         var currentRange = new Range(lowerBound, upperBound);
                         taintedRanges.Add(currentRange);
-                        argumentRanges.Add(new RangeForArgumentIndex
-                        {
-                            Index = currentFragment.FragmentArgumentIndex,
-                            Range = currentRange,
-                        });
+                        associatedToRangeIndexes.Add(currentFragment.FragmentArgumentIndex);
                     }
                     currentFragmentIndex++;
                 }
@@ -99,19 +76,7 @@ namespace LibProtection.Injections
                 }
             }
 
-            var formatted = formattedBuilder.ToString();
-
-            var sanitizeResult = LanguageService<T>.TrySanitize(formatted, taintedRanges);
-            if (sanitizeResult.Success)
-            {
-                return FormatResult.Success(sanitizeResult.Tokens, sanitizeResult.SanitizedText);
-            }
-            else
-            {
-                var attackArgument = argumentRanges.Find(argumentRange => argumentRange.Range.Overlaps(sanitizeResult.AttackToken.Range));
-                Debug.Assert(attackArgument != null, "Cannot find attack argument for attack token.");
-                return FormatResult.Fail(sanitizeResult.Tokens, attackArgument.Index);
-            }
+            return formattedBuilder.ToString();
         }
     }
 }

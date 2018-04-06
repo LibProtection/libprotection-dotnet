@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LibProtection.Injections
+namespace LibProtection.Injections.Formatting
 {
     internal struct FormatResult
     {

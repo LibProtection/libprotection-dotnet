@@ -1,26 +1,26 @@
 ﻿using System;
 using System.Globalization;
 
-namespace LibProtection.Injections
+namespace LibProtection.Injections.Formatting
 {
-    internal class ArgumentWrapper
+    class ArgumentWrapper
     {
         public object Argument { get; set; }
         public int Index { get; set; }
     }
 
-    internal class Formatter<T> : ICustomFormatter where T: LanguageProvider
+    class ComplementaryFormatter : ICustomFormatter
     {
         private readonly char _complementaryChar;
 
-        public Formatter(char complementaryChar)
+        public ComplementaryFormatter(char complementaryChar)
         {
             _complementaryChar = complementaryChar;
         }
 
         public string Format(string format, object argumentWrapperObj, IFormatProvider formatProvider)
         {
-            if (!(formatProvider is FormatProvider<T> provider))
+            if (!(formatProvider is Formatter provider))
             {
                 throw new FormatException($"Invalid format provider: {formatProvider}");
             }

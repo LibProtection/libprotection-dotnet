@@ -12,7 +12,7 @@ namespace LibProtection.Injections
         public Token AttackToken { get; set; }
     }
 
-    internal static class LanguageService<T> where T : LanguageProvider
+    internal static class LanguageService
     {
         /// <summary>
         /// Try to sanitize or 
@@ -23,10 +23,9 @@ namespace LibProtection.Injections
         /// <param name="sanitizedText">Sanitized text if success</param>
         /// <param name="attackToken">Attack token if failed</param>
         /// <returns>success of sanitize</returns>
-        public static SanitizeResult TrySanitize(string text, List<Range> taintedRanges)
+        public static SanitizeResult TrySanitize(LanguageProvider languageProvider, string text, List<Range> taintedRanges)
         {
             var sanitizedRanges = new List<Range>();
-            var languageProvider = Single<T>.Instance;
             var tokens = languageProvider.Tokenize(text).ToArray();
             var fragments = new Dictionary<Range, string>();
 
@@ -44,7 +43,6 @@ namespace LibProtection.Injections
             }
 
             // Replace all attacked text's fragments with corresponding sanitized values
-
             var positionAtText = 0;
             var sanitizedBuilder = new StringBuilder();
 
@@ -65,7 +63,7 @@ namespace LibProtection.Injections
             }
 
             var sanitizedText = sanitizedBuilder.ToString();
-            var success = Validate(sanitizedText, sanitizedRanges, out var attackToken);
+            var success = Validate(languageProvider, sanitizedText, sanitizedRanges, out var attackToken);
 
             return new SanitizeResult
             {
@@ -76,9 +74,8 @@ namespace LibProtection.Injections
             };
         }
 
-        public static bool Validate(string text, List<Range> ranges, out Token attackToken)
+        public static bool Validate(LanguageProvider languageProvider, string text, List<Range> ranges, out Token attackToken)
         {
-            var languageProvider = Single<T>.Instance;
             var tokens = languageProvider.Tokenize(text);
 
             var scopesCount = 0;

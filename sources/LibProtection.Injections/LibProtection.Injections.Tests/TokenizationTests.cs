@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.IO;
+using LibProtection.Injections.Formatting;
 using Newtonsoft.Json;
 using NUnit.Framework;
 

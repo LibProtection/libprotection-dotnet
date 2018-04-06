@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibProtection.Injections.Formatting;
+using System;
 
 namespace LibProtection.Injections.Tests
 {
