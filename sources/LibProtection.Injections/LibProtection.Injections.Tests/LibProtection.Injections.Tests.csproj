@@ -23,4 +23,13 @@
     <ProjectReference Include="..\LibProtection.Injections\LibProtection.Injections.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="formatCases\example.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="TestCases\formatCases\example.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
