@@ -68,7 +68,7 @@
             "Text":"alert",
             "LanguageProvider":"JavaScript",
             "TypeName":"JavaScriptTokenType",
-            "TypeValue":"OpenParen",
+            "TypeValue":"Identifier",
             "RangeLowerBound":32,
             "RangeUpperBound":36
          },
