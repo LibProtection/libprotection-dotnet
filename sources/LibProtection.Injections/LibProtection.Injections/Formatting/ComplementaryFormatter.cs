@@ -1,23 +1,32 @@
 ﻿using System;
 using System.Globalization;
 
-namespace LibProtection.Injections
+namespace LibProtection.Injections.Formatting
 {
-    internal class Formatter<T> : ICustomFormatter where T: LanguageProvider
+    class ArgumentWrapper
+    {
+        public object Argument { get; set; }
+        public int Index { get; set; }
+    }
+
+    class ComplementaryFormatter : ICustomFormatter
     {
         private readonly char _complementaryChar;
 
-        public Formatter(char complementaryChar)
+        public ComplementaryFormatter(char complementaryChar)
         {
             _complementaryChar = complementaryChar;
         }
 
-        public string Format(string format, object arg, IFormatProvider formatProvider)
+        public string Format(string format, object argumentWrapperObj, IFormatProvider formatProvider)
         {
-            if (!(formatProvider is FormatProvider<T> provider))
+            if (!(formatProvider is Formatter provider))
             {
                 throw new FormatException($"Invalid format provider: {formatProvider}");
             }
+
+            var argumentWrapper = (ArgumentWrapper)argumentWrapperObj;
+            var arg = argumentWrapper.Argument;
 
             bool isSafe = false;
             string formattedValue = null;
@@ -56,7 +65,7 @@ namespace LibProtection.Injections
             if (formattedValue == null) { formattedValue = arg.ToString(); }
             
             provider.AddFragment(
-                new Fragment(formattedValue, isSafe)
+                new Fragment(formattedValue, isSafe, argumentWrapper.Index)
             );
 
             return new string(_complementaryChar, formattedValue.Length);

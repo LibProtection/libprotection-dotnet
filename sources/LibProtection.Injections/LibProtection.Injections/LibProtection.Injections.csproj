@@ -49,5 +49,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Antlr4" Version="4.6.5-beta001" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 </Project>

@@ -3,20 +3,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace LibProtection.Injections
+namespace LibProtection.Injections.Formatting
 {
-    internal class FormatProvider<T> : IFormatProvider where T: LanguageProvider
+    internal class Formatter : IFormatProvider
     {
-        // ReSharper disable once StaticMemberInGenericType
-        private static readonly RandomizedLRUCache<FormatCacheItem, Option<string>> Cache
-            = new RandomizedLRUCache<FormatCacheItem, Option<string>>(1024);
-
-        private readonly Formatter<T> _formatter;
+        private readonly ComplementaryFormatter _formatter;
         private readonly List<Fragment> _formattedFragments = new List<Fragment>();
 
-        private FormatProvider(char complementaryChar)
+        private Formatter(char complementaryChar)
         {
-            _formatter = new Formatter<T>(complementaryChar);
+            _formatter = new ComplementaryFormatter(complementaryChar);
         }
 
         public object GetFormat(Type formatType)
@@ -29,23 +25,25 @@ namespace LibProtection.Injections
             _formattedFragments.Add(fragment);
         }
 
-        public static bool TryFormat(string format, out string formatted, object[] args)
+        public static string Format(string format, object[] args, out List<Range> taintedRanges, out List<int> associatedToRangeIndexes)
         {
-            var keyItem = new FormatCacheItem(format, args);
-            var cacheOption = Cache.Get(keyItem, TryFormatInternal);
-            formatted = cacheOption.Value;
-            return cacheOption.HasValue;
-        }
-
-        private static Option<string> TryFormatInternal(FormatCacheItem formatItem)
-        {
-            var format = formatItem.Format;
-            var args = formatItem.Args;
+            taintedRanges = new List<Range>();
+            associatedToRangeIndexes = new List<int>();
 
             var complementaryChar = format.GetComplementaryChar();
-            var formatProvider = new FormatProvider<T>(complementaryChar);
-            var formattedBuilder = new StringBuilder(string.Format(formatProvider, format, args));
-            var taintedRanges = new List<Range>();
+            var formatProvider = new Formatter(complementaryChar);
+            //wrap arguments to memorize argument index
+            var wrappedArguments = new ArgumentWrapper[args.Length];
+            for(int i = 0; i < args.Length; i++)
+            {
+                wrappedArguments[i] = new ArgumentWrapper
+                {
+                    Argument = args[i],
+                    Index = i,
+                };
+            }
+            
+            var formattedBuilder = new StringBuilder(string.Format(formatProvider, format, wrappedArguments));
             var currentCharIndex = 0;
             var currentFragmentIndex = 0;
             
@@ -65,7 +63,11 @@ namespace LibProtection.Injections
                     }
 
                     var upperBound = currentCharIndex - 1;
-                    if (!currentFragment.IsSafe) { taintedRanges.Add(new Range(lowerBound, upperBound)); }
+                    if (!currentFragment.IsSafe) {
+                        var currentRange = new Range(lowerBound, upperBound);
+                        taintedRanges.Add(currentRange);
+                        associatedToRangeIndexes.Add(currentFragment.FragmentArgumentIndex);
+                    }
                     currentFragmentIndex++;
                 }
                 else
@@ -74,11 +76,7 @@ namespace LibProtection.Injections
                 }
             }
 
-            var formatted = formattedBuilder.ToString();
-
-            return LanguageService<T>.TrySanitize(formatted, taintedRanges, out var sanitized)
-                ? new Option<string>(sanitized)
-                : Option<string>.None;
+            return formattedBuilder.ToString();
         }
     }
 }

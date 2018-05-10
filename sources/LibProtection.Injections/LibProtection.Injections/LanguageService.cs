@@ -1,16 +1,32 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace LibProtection.Injections
 {
-    internal static class LanguageService<T> where T : LanguageProvider
+    internal struct SanitizeResult
     {
-        public static bool TrySanitize(string text, List<Range> taintedRanges, out string sanitizedText)
+        public bool Success { get; set; }
+        public Token[] Tokens { get; set; }
+        public string SanitizedText { get; set; }
+        public Token AttackToken { get; set; }
+    }
+
+    internal static class LanguageService
+    {
+        /// <summary>
+        /// Try to sanitize or 
+        /// </summary>
+        /// <param name="text">Text to sanitize</param>
+        /// <param name="taintedRanges">ranges of taint</param>
+        /// <param name="tokens">Artifact tokens</param>
+        /// <param name="sanitizedText">Sanitized text if success</param>
+        /// <param name="attackToken">Attack token if failed</param>
+        /// <returns>success of sanitize</returns>
+        public static SanitizeResult TrySanitize(LanguageProvider languageProvider, string text, List<Range> taintedRanges)
         {
-            sanitizedText = null;
             var sanitizedRanges = new List<Range>();
-            var languageProvider = Single<T>.Instance;
-            var tokens = languageProvider.Tokenize(text);
+            var tokens = languageProvider.Tokenize(text).ToArray();
             var fragments = new Dictionary<Range, string>();
 
             // Try to sanitize all attacked text's fragments
@@ -27,7 +43,6 @@ namespace LibProtection.Injections
             }
 
             // Replace all attacked text's fragments with corresponding sanitized values
-
             var positionAtText = 0;
             var sanitizedBuilder = new StringBuilder();
 
@@ -47,13 +62,20 @@ namespace LibProtection.Injections
                 
             }
 
-            sanitizedText = sanitizedBuilder.ToString();
-            return Validate(sanitizedText, sanitizedRanges);
+            var sanitizedText = sanitizedBuilder.ToString();
+            var success = Validate(languageProvider, sanitizedText, sanitizedRanges, out var attackToken);
+
+            return new SanitizeResult
+            {
+                Success = success,
+                AttackToken = success ? null : attackToken,
+                SanitizedText = success ? sanitizedText : null,
+                Tokens = tokens,
+            };
         }
 
-        public static bool Validate(string text, List<Range> ranges)
+        public static bool Validate(LanguageProvider languageProvider, string text, List<Range> ranges, out Token attackToken)
         {
-            var languageProvider = Single<T>.Instance;
             var tokens = languageProvider.Tokenize(text);
 
             var scopesCount = 0;
@@ -63,9 +85,13 @@ namespace LibProtection.Injections
             {
                 scopesCount++;
                 allTrivial &= scope.IsTrivial;
-                if ((scope.Tokens.Count > 1 ||  scopesCount > 1) && !allTrivial) { return false; }
+                if ((scope.Tokens.Count > 1 ||  scopesCount > 1) && !allTrivial) {
+                    attackToken = scope.Tokens.Find(token => !token.IsTrivial);
+                    return false;
+                }
             }
 
+            attackToken = null;
             return true;
         }
 
