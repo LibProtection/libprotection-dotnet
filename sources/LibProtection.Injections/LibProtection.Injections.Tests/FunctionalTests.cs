@@ -20,7 +20,7 @@ namespace LibProtection.Injections.Tests
                 return Result == null;
             }
 
-            public static DataPoint getDataPoint<T>(string result, string format, params object[] arguments) where T : LanguageProvider
+            public static DataPoint GetDataPoint<T>(string result, string format, params object[] arguments) where T : LanguageProvider
             {
                 DataPoint point = new DataPoint();
                 point.LanguageProviderType = typeof(T);
@@ -33,26 +33,26 @@ namespace LibProtection.Injections.Tests
 
         private static DataPoint[] testCases = new DataPoint[]{
             //Valid
-            DataPoint.getDataPoint<Html>("<a href='Default.aspx' onclick='alert(\"Hello from embedded JavaScript code!\");return false'>This site&#39;s home page</a>", "<a href='{0}' onclick='alert(\"{1}\");return false'>{2}</a>", "Default.aspx", "Hello from embedded JavaScript code!", "This site's home page"),
-            DataPoint.getDataPoint<JavaScript>("operationResult.innerText = 'operationResult.innerText = \\u0027Hello from internal JavaScript code!\\u0027;';", "operationResult.innerText = '{0}';", "operationResult.innerText = 'Hello from internal JavaScript code!';"),
-            DataPoint.getDataPoint<Sql>("SELECT * FROM myTable WHERE id = 1 AND myColumn = 'value1'", "SELECT * FROM myTable WHERE id = {0} AND myColumn = '{1}'",  1, "value1"),
-            DataPoint.getDataPoint<Url>("Assets/jsFile.js", "{0}/{1}", "Assets", "jsFile.js"),
-            DataPoint.getDataPoint<FilePath>("C:\\inetpub\\playground.libprotection.org\\Assets\\textFile.txt", "C:\\inetpub\\playground.libprotection.org\\Assets\\{0}", "textFile.txt"),
+            DataPoint.GetDataPoint<Html>("<a href='Default.aspx' onclick='alert(\"Hello from embedded JavaScript code!\");return false'>This site&#39;s home page</a>", "<a href='{0}' onclick='alert(\"{1}\");return false'>{2}</a>", "Default.aspx", "Hello from embedded JavaScript code!", "This site's home page"),
+            DataPoint.GetDataPoint<JavaScript>("operationResult.innerText = 'operationResult.innerText = \\u0027Hello from internal JavaScript code!\\u0027;';", "operationResult.innerText = '{0}';", "operationResult.innerText = 'Hello from internal JavaScript code!';"),
+            DataPoint.GetDataPoint<Sql>("SELECT * FROM myTable WHERE id = 1 AND myColumn = 'value1'", "SELECT * FROM myTable WHERE id = {0} AND myColumn = '{1}'",  1, "value1"),
+            DataPoint.GetDataPoint<Url>("Assets/jsFile.js", "{0}/{1}", "Assets", "jsFile.js"),
+            DataPoint.GetDataPoint<FilePath>("C:\\inetpub\\playground.libprotection.org\\Assets\\textFile.txt", "C:\\inetpub\\playground.libprotection.org\\Assets\\{0}", "textFile.txt"),
             //Attacks
-            DataPoint.getDataPoint<Html>(null, "<a href={0} />", "<br>"),
-            DataPoint.getDataPoint<JavaScript>(null, "operationResult.innerText = {0};", "' <br>"),
-            DataPoint.getDataPoint<Sql>(null, "SELECT * FROM myTable WHERE id = {0}", "1 OR 1==1 --"),
-            DataPoint.getDataPoint<Url>(null, "{0}/{1}", "../Asserts", "jsFile.js"),
-            DataPoint.getDataPoint<FilePath>(null, "C:\\Assets\\{0}", "..\\jsFile.js"),
+            DataPoint.GetDataPoint<Html>(null, "<a href={0} />", "<br>"),
+            DataPoint.GetDataPoint<JavaScript>(null, "operationResult.innerText = {0};", "' <br>"),
+            DataPoint.GetDataPoint<Sql>(null, "SELECT * FROM myTable WHERE id = {0}", "1 OR 1==1 --"),
+            DataPoint.GetDataPoint<Url>(null, "{0}/{1}", "../Asserts", "jsFile.js"),
+            DataPoint.GetDataPoint<FilePath>(null, "C:\\Assets\\{0}", "..\\jsFile.js"),
             //safe modifier
-            DataPoint.getDataPoint<Html>(":safe", ":safe"),
-            DataPoint.getDataPoint<Html>(":safe&lt;br&gt;", "{0}", ":safe<br>"),
-            DataPoint.getDataPoint<Html>("&lt;br&gt;xxx:safe", "{0}xxx:safe", "<br>"),
-            DataPoint.getDataPoint<Html>("<br>", "{0:safe}", "<br>"),
-            DataPoint.getDataPoint<Html>("<br>", "{0:SaFe}", "<br>"),
-            DataPoint.getDataPoint<Html>("<br>:safe", "{0:safe}:safe", "<br>"),
-            DataPoint.getDataPoint<Html>("<br>&lt;br&gt;", "{0:safe}{1}", "<br>", "<br>"),
-            DataPoint.getDataPoint<Html>("&lt;br&gt;<br>&lt;br&gt;", "{0}{1:safe}{2}", "<br>", "<br>", "<br>"),
+            DataPoint.GetDataPoint<Html>(":safe", ":safe"),
+            DataPoint.GetDataPoint<Html>(":safe&lt;br&gt;", "{0}", ":safe<br>"),
+            DataPoint.GetDataPoint<Html>("&lt;br&gt;xxx:safe", "{0}xxx:safe", "<br>"),
+            DataPoint.GetDataPoint<Html>("<br>", "{0:safe}", "<br>"),
+            DataPoint.GetDataPoint<Html>("<br>", "{0:SaFe}", "<br>"),
+            DataPoint.GetDataPoint<Html>("<br>:safe", "{0:safe}:safe", "<br>"),
+            DataPoint.GetDataPoint<Html>("<br>&lt;br&gt;", "{0:safe}{1}", "<br>", "<br>"),
+            DataPoint.GetDataPoint<Html>("&lt;br&gt;<br>&lt;br&gt;", "{0}{1:safe}{2}", "<br>", "<br>", "<br>"),
         };
 
 
