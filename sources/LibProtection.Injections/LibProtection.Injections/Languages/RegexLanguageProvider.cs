@@ -28,7 +28,7 @@ namespace LibProtection.Injections
                             var tokenText = text.Substring(0, matchedLength);
 
                             var token = CreateToken(rule.Type, currentPosition + offset,
-                                currentPosition + offset + tokenText.Length - 1, tokenText);
+                                currentPosition + offset + tokenText.Length, tokenText);
 
                             text = text.Substring(matchedLength);
                             currentPosition += matchedLength;
@@ -45,7 +45,7 @@ namespace LibProtection.Injections
                 // Simply error-tolerance strategy: consider current char as error-token and move to next
                 if (!isMatched)
                 {
-                    var token = CreateToken(ErrorTokenType, currentPosition + offset, currentPosition + offset,
+                    var token = CreateToken(ErrorTokenType, currentPosition + offset, currentPosition + offset + 1,
                         text[0].ToString());
 
                     text = text.Substring(1);

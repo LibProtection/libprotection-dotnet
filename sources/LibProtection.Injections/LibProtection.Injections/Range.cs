@@ -3,12 +3,12 @@ using System.Diagnostics;
 
 namespace LibProtection.Injections
 {
-    [DebuggerDisplay("[{LowerBound}..{UpperBound}]")]
+    [DebuggerDisplay("{ToString()}")]
     public struct Range : IEquatable<Range>
     {
         public int LowerBound { get; }
         public int UpperBound { get; }
-        public int Length => UpperBound - LowerBound + 1;
+        public int Length => UpperBound - LowerBound;
 
         public Range(int lowerBound, int upperBound)
         {
@@ -18,7 +18,7 @@ namespace LibProtection.Injections
 
         public bool Contains(int point)
         {
-            return LowerBound <= point && UpperBound >= point;
+            return LowerBound <= point && UpperBound > point;
         }
 
         public bool Contains(Range range)
@@ -30,12 +30,12 @@ namespace LibProtection.Injections
         {
             return LowerBound >= range.LowerBound && UpperBound <= range.UpperBound
                    || Contains(range.LowerBound)
-                   || Contains(range.UpperBound);
+                   || Contains(range.UpperBound - 1);
         }
 
         public override string ToString()
         {
-            return $"[{LowerBound}..{UpperBound}]";
+            return Length != 0 ? $"[{LowerBound}..{UpperBound})" : $"[{LowerBound})";
         }
 
         public bool Equals(Range other)

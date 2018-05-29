@@ -16,7 +16,7 @@
             "TypeName":"HtmlTokenType",
             "TypeValue":"TagOpen",
             "RangeLowerBound":0,
-            "RangeUpperBound":1
+            "RangeUpperBound":2
          },
          {  
             "IsTrivial":false,
@@ -25,7 +25,7 @@
             "TypeName":"HtmlTokenType",
             "TypeValue":"AttributeName",
             "RangeLowerBound":3,
-            "RangeUpperBound":6
+            "RangeUpperBound":7
          },
          {  
             "IsTrivial":false,
@@ -34,7 +34,7 @@
             "TypeName":"HtmlTokenType",
             "TypeValue":"TagEquals",
             "RangeLowerBound":7,
-            "RangeUpperBound":7
+            "RangeUpperBound":8
          },
          {  
             "IsTrivial":true,
@@ -43,7 +43,7 @@
             "TypeName":"UrlTokenType",
             "TypeValue":"PathEntry",
             "RangeLowerBound":9,
-            "RangeUpperBound":20
+            "RangeUpperBound":21
          },
          {  
             "IsTrivial":false,
@@ -52,7 +52,7 @@
             "TypeName":"HtmlTokenType",
             "TypeValue":"AttributeName",
             "RangeLowerBound":23,
-            "RangeUpperBound":29
+            "RangeUpperBound":30
          },
          {  
             "IsTrivial":false,
@@ -61,7 +61,7 @@
             "TypeName":"HtmlTokenType",
             "TypeValue":"TagEquals",
             "RangeLowerBound":30,
-            "RangeUpperBound":30
+            "RangeUpperBound":31
          },
          {  
             "IsTrivial":false,
@@ -70,7 +70,7 @@
             "TypeName":"JavaScriptTokenType",
             "TypeValue":"Identifier",
             "RangeLowerBound":32,
-            "RangeUpperBound":36
+            "RangeUpperBound":37
          },
          {  
             "IsTrivial":false,
@@ -79,7 +79,7 @@
             "TypeName":"JavaScriptTokenType",
             "TypeValue":"OpenParen",
             "RangeLowerBound":37,
-            "RangeUpperBound":37
+            "RangeUpperBound":38
          },
          {  
             "IsTrivial":true,
@@ -88,7 +88,7 @@
             "TypeName":"JavaScriptTokenType",
             "TypeValue":"StringLiteral",
             "RangeLowerBound":38,
-            "RangeUpperBound":75
+            "RangeUpperBound":76
          },
          {  
             "IsTrivial":false,
@@ -97,7 +97,7 @@
             "TypeName":"JavaScriptTokenType",
             "TypeValue":"CloseParen",
             "RangeLowerBound":76,
-            "RangeUpperBound":76
+            "RangeUpperBound":77
          },
          {  
             "IsTrivial":false,
@@ -106,7 +106,7 @@
             "TypeName":"JavaScriptTokenType",
             "TypeValue":"SemiColon",
             "RangeLowerBound":77,
-            "RangeUpperBound":77
+            "RangeUpperBound":78
          },
          {  
             "IsTrivial":false,
@@ -115,7 +115,7 @@
             "TypeName":"JavaScriptTokenType",
             "TypeValue":"Return",
             "RangeLowerBound":78,
-            "RangeUpperBound":83
+            "RangeUpperBound":84
          },
          {  
             "IsTrivial":false,
@@ -124,7 +124,7 @@
             "TypeName":"JavaScriptTokenType",
             "TypeValue":"WhiteSpaces",
             "RangeLowerBound":84,
-            "RangeUpperBound":84
+            "RangeUpperBound":85
          },
          {  
             "IsTrivial":true,
@@ -133,7 +133,7 @@
             "TypeName":"JavaScriptTokenType",
             "TypeValue":"BooleanLiteral",
             "RangeLowerBound":85,
-            "RangeUpperBound":89
+            "RangeUpperBound":90
          },
          {  
             "IsTrivial":false,
@@ -142,7 +142,7 @@
             "TypeName":"HtmlTokenType",
             "TypeValue":"TagClose",
             "RangeLowerBound":91,
-            "RangeUpperBound":91
+            "RangeUpperBound":92
          },
          {  
             "IsTrivial":true,
@@ -151,7 +151,7 @@
             "TypeName":"HtmlTokenType",
             "TypeValue":"HtmlText",
             "RangeLowerBound":92,
-            "RangeUpperBound":112
+            "RangeUpperBound":113
          },
          {  
             "IsTrivial":false,
@@ -160,7 +160,7 @@
             "TypeName":"HtmlTokenType",
             "TypeValue":"TagOpen",
             "RangeLowerBound":113,
-            "RangeUpperBound":115
+            "RangeUpperBound":116
          },
          {  
             "IsTrivial":false,
@@ -169,7 +169,7 @@
             "TypeName":"HtmlTokenType",
             "TypeValue":"TagClose",
             "RangeLowerBound":116,
-            "RangeUpperBound":116
+            "RangeUpperBound":117
          }
       ],
       "IsAttackDetected":false,
