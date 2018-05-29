@@ -67,7 +67,7 @@ namespace LibProtection.Injections
             switch (tokenType)
             {
                 case SqlTokenType.StringLiteral:
-                    encoded = text.Replace("''", "'").Replace("'", "''");
+                    encoded = text.Replace("'", "''");
                     return true;
             }
 
