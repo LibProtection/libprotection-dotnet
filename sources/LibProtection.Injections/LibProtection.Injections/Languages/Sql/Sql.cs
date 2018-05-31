@@ -43,9 +43,6 @@ namespace LibProtection.Injections
             {
                 case SqlTokenType.Space:
                     
-                case SqlTokenType.CommentInput:
-                case SqlTokenType.LineComment:
-                
                 case SqlTokenType.NullLiteral:
                 case SqlTokenType.FilesizeLiteral:
                 case SqlTokenType.StartNationalStringLiteral:
