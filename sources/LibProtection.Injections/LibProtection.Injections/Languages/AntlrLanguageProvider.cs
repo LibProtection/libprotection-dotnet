@@ -16,7 +16,7 @@ namespace LibProtection.Injections
             while (antlrToken.Type != EofAntrlTokenType)
             {
                 yield return CreateToken(ConvertAntlrTokenType(antlrToken.Type), antlrToken.StartIndex + offset,
-                    antlrToken.StopIndex + offset, antlrToken.Text);
+                    antlrToken.StopIndex + offset + 1, antlrToken.Text);
 
                 antlrToken = lexer.NextToken();
             }

@@ -43,9 +43,6 @@ namespace LibProtection.Injections
             {
                 case SqlTokenType.Space:
                     
-                case SqlTokenType.CommentInput:
-                case SqlTokenType.LineComment:
-                
                 case SqlTokenType.NullLiteral:
                 case SqlTokenType.FilesizeLiteral:
                 case SqlTokenType.StartNationalStringLiteral:
@@ -67,7 +64,7 @@ namespace LibProtection.Injections
             switch (tokenType)
             {
                 case SqlTokenType.StringLiteral:
-                    encoded = text.Replace("''", "'").Replace("'", "''");
+                    encoded = text.Replace("'", "''");
                     return true;
             }
 

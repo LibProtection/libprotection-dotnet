@@ -52,8 +52,8 @@ namespace LibProtection.Injections
                 sanitizedBuilder.Append(text, positionAtText, charsToAppend);
                 var lowerBound = sanitizedBuilder.Length;
                 sanitizedBuilder.Append(fragments[range]);
-                sanitizedRanges.Add(new Range(lowerBound, sanitizedBuilder.Length - 1));
-                positionAtText = range.UpperBound + 1;
+                sanitizedRanges.Add(new Range(lowerBound, sanitizedBuilder.Length));
+                positionAtText = range.UpperBound;
             }
 
             if (positionAtText < text.Length)

@@ -62,9 +62,8 @@ namespace LibProtection.Injections.Formatting
                         currentCharIndex++;
                     }
 
-                    var upperBound = currentCharIndex - 1;
                     if (!currentFragment.IsSafe) {
-                        var currentRange = new Range(lowerBound, upperBound);
+                        var currentRange = new Range(lowerBound, currentCharIndex);
                         taintedRanges.Add(currentRange);
                         associatedToRangeIndexes.Add(currentFragment.FragmentArgumentIndex);
                     }
