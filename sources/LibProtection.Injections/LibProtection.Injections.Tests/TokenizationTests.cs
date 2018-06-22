@@ -26,7 +26,7 @@ namespace LibProtection.Injections.Tests
             {
                 var casesDirectory = Path.Combine(
                     Path.GetDirectoryName(new Uri(typeof(TokenizationTests).Assembly.CodeBase).LocalPath),
-                    "TestCases\\formatCases");
+                    $"TestCases{Path.DirectorySeparatorChar}formatCases");
 
                 foreach(var file in Directory.GetFiles(casesDirectory))
                 {
