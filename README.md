@@ -6,9 +6,9 @@ This project is in the state of early beta. It is stable enough for the public t
 
 **Libprotection.NET** is a .NET version of LibProtection library — an alternative implementation of the standard functionality of the formatted and interpolated strings. It provides a realtime automatic protection from any class of the injection attacks, which belong to the most attacked languages (HTML, URL, JavaScript, SQL and the file paths are currently supported).
 
-| Windows Build Status |
-|---|
-|[![Build status](https://ci.appveyor.com/api/projects/status/8y9t294ypeuu18rs/branch/dev?svg=true)](https://ci.appveyor.com/project/libprotection/libprotection-dotnet/branch/dev)|
+| Windows Build Status | Linux Build Status |
+|---|---|
+|[![Build status](https://ci.appveyor.com/api/projects/status/8y9t294ypeuu18rs/branch/dev?svg=true)](https://ci.appveyor.com/project/libprotection/libprotection-dotnet/branch/dev) | [![Build Status](https://travis-ci.org/LibProtection/libprotection-dotnet.svg?branch=dev)](https://travis-ci.org/LibProtection/libprotection-dotnet)|
 
 ## How it works
 

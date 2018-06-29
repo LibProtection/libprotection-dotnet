@@ -1,0 +1,17 @@
+language: csharp
+solution: ./sources/LibProtection.Injections/LibProtection.sln
+dist: trusty
+mono: none
+dotnet: 2.1.301 
+
+git:
+  submodules: false
+
+before_script:
+  - git submodule update --init --recursive
+
+script:
+  - cd ./sources/LibProtection.Injections
+  - dotnet build -c Release -f netcoreapp2.0
+  - cd ./LibProtection.Injections.Tests
+  - dotnet test -f netcoreapp2.0
