@@ -1,0 +1,126 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "LibProtection Playground";
+
+    Response.Headers.Add("X-XSS-Protection", "0");
+}
+
+<div>
+    @{
+        var id = (Request.Query.TryGetValue("Id", out var value)) ? value.ToString() : null;
+        if (id == null)
+        {
+            id = Model.Examples.Keys.First();
+        }
+    }
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        window.grammarSelectorId.value = "@id";
+            window.grammarSelectorId.onchange = function () {
+                window.location = "Index?Id=" + encodeURIComponent(window.grammarSelectorId.value);
+            }
+        });
+    </script>
+
+    <div id="exampleFormsId">
+
+        @if (!Model.Examples.ContainsKey(id))
+        {
+            <div class="alert alert-dismissible alert-warning">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>Unknown language provider: @id</strong>
+            </div>
+        }
+        else
+        {
+            var example = Model.Examples[id];
+
+            var parameters = string.IsNullOrEmpty(Request.Query["Parameters"].ToString()) ? example.Parameters : Request.Query["Parameters"].ToString();
+
+            var format = string.IsNullOrEmpty(Request.Query["Format"].ToString()) || Model.InputsAreDisabled ?
+                example.Format :
+                Request.Query["Format"].ToString();
+
+            <div style="width:100%">
+                <div style="margin-top: 20px">
+                    <h5>Vulnerable operation:</h5>
+                    @example.Operation
+                </div>
+                <div style="display: table; width: 100%; margin-top: 20px">
+                    <div style="padding-right: 10px; display: table-cell; width: 50%">
+                        <h5>Format string:</h5>
+                        <input class="form-control" type="text" value="@format" ID="format" @(Model.InputsAreDisabled ? "disabled=\"disabled\"" : string.Empty) />
+                    </div>
+                    <div style="padding-left: 10px; display: table-cell; width: 50%">
+                        <h5>Arguments <small class="text-muted">(one per line):</small></h5>
+                        <textarea class="form-control" rows="5" ID="parameters">@parameters</textarea>
+                    </div>
+                </div>
+                <div style="text-align: right; margin-top: 20px">
+                    <input style="width: 160px; display: inline-block" class="form-control" type="button" id="button" value="Try format" />
+                </div>
+            </div>
+            @try
+            {
+                <div style="margin-top: 20px">
+                    @{
+                        var results = Model.GetResultsFor(example, format, parameters);
+                    }
+                    <h5>Format result:</h5>
+                    @results.FormatResult
+                </div>
+                <div style="margin-top: 20px">
+                    <h5>Vulnerable operation result:</h5>
+                    @if (string.IsNullOrEmpty(results.OperationResult))
+                    {
+                        <span class="text-warning">None</span>
+                    }
+                    else
+                    {
+                        <span class="text-success" id="operationResult">@Html.Raw(@results.OperationResult)</span>
+                    }
+                </div>
+            }
+            catch (LibProtection.Injections.AttackDetectedException)
+            {
+                <div class="alert alert-dismissible alert-danger">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <strong>Attack detected!</strong> Vulnerable operation was not executed
+                </div>
+            }
+            catch (Exception e)
+            {
+                <div class="alert alert-dismissible alert-warning">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <strong>Exception occured: @e.Message</strong>
+                </div>
+            }
+            <script>
+                button.onclick = function () {
+                    window.location =
+                        "Index?Id=" + encodeURIComponent("@id") +
+                        @if (!Model.InputsAreDisabled)
+                        {
+                            @: "&Format=" + encodeURIComponent(window.format.value) +
+                        }
+
+                        "&Parameters=" + encodeURIComponent(window.parameters.value);
+                }
+            </script>
+            <hr />
+        }
+    </div>
+
+    <script>
+        function addOption(item) {
+            var option = document.createElement("option");
+            option.text = item;
+            grammarSelectorId.add(option);
+        }
+
+        @foreach (var item in Model.Examples.Keys) {
+            @:addOption("@item")
+        }
+    </script>
+</div>
