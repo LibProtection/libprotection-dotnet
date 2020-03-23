@@ -35,7 +35,7 @@ deploy:
   artifact: packages
 - provider: GitHub
   auth_token:
-    secure: XeMjiYrdCvXExNd4Mp+XNxl/DMo+IyGK/sa7ayNMXfNL63lbujqGaqxXH+yoUNCa
+    secure: bOXMe9NbPkdWiZqbMH90QGWJtBcZCup1YwKJBtl+hQc4udL97QNEB0hgZ1wL+MwO
   repository: LibProtection/libprotection-dotnet
   artifact: binaries
   prerelease: true
