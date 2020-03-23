@@ -33,16 +33,12 @@ deploy:
   api_key:
     secure: FSZNincXxq19Gtq2cMqVlsskS+6YXIYnTnmLHruLZMCOBo4fRF4Hukp3LBFNNrnT
   artifact: packages
-  on:
-    branch: master
 - provider: GitHub
   auth_token:
     secure: XeMjiYrdCvXExNd4Mp+XNxl/DMo+IyGK/sa7ayNMXfNL63lbujqGaqxXH+yoUNCa
   repository: LibProtection/libprotection-dotnet
   artifact: binaries
   prerelease: true
-  on:
-    branch: master
 notifications:
 - provider: Email
   to:
