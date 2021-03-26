@@ -6,14 +6,20 @@ namespace LibProtection.Injections
     [DebuggerDisplay("{ToString()}")]
     public struct Range : IEquatable<Range>
     {
-        public int LowerBound { get; }
-        public int UpperBound { get; }
+        public int LowerBound { get; private set; }
+        public int UpperBound { get; private set; }
         public int Length => UpperBound - LowerBound;
 
         public Range(int lowerBound, int upperBound)
         {
             LowerBound = lowerBound;
             UpperBound = upperBound;
+        }
+
+        public void Offset(int value)
+        {
+            LowerBound += value;
+            UpperBound += value;
         }
 
         public bool Contains(int point)
@@ -57,6 +63,20 @@ namespace LibProtection.Injections
                 hashCode = (hashCode * 397) ^ UpperBound.GetHashCode();
                 return hashCode;
             }
+        }
+
+        public static bool operator <(Range a, Range b)
+        => a.UpperBound <= b.LowerBound;
+
+        public static bool operator >(Range a, Range b)
+        => a.LowerBound >= b.UpperBound;
+
+        public Range ConvexHull(Range other)
+        {
+            return new Range(
+                Math.Min(LowerBound, other.LowerBound),
+                Math.Max(UpperBound, other.UpperBound)
+                );
         }
     }
 }
