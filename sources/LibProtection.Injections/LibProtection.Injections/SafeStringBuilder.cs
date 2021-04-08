@@ -9,7 +9,7 @@ namespace LibProtection.Injections
         private StringBuilder internalBuilder;
         //TODO: implement sorted storage for taintedRanges
         //TODO: when new range is added check if it can be merged with one or both of its neighbours
-        private readonly List<Range> taintedRanges = new List<Range>();
+        internal readonly SortedRangesList taintedRanges = new SortedRangesList();
 
         #region Constructors
         public SafeStringBuilder()
@@ -27,7 +27,7 @@ namespace LibProtection.Injections
             internalBuilder = new StringBuilder(value);
             if (!isSafe)
             {
-                taintedRanges.Add(new Range(0, value.Length));
+                taintedRanges.AddLast(new Range(0, value.Length));
             }
         }
 
@@ -41,7 +41,7 @@ namespace LibProtection.Injections
             internalBuilder = new StringBuilder(value, capacity);
             if (!isSafe)
             {
-                taintedRanges.Add(new Range(0, value.Length));
+                taintedRanges.AddLast(new Range(0, value.Length));
             }
         }
 
@@ -50,7 +50,7 @@ namespace LibProtection.Injections
             internalBuilder = new StringBuilder(value, startIndex, length, capacity);
             if (!isSafe)
             {
-                taintedRanges.Add(new Range(0, length));
+                taintedRanges.AddLast(new Range(0, length));
             }
         }
         #endregion constructors
@@ -58,7 +58,7 @@ namespace LibProtection.Injections
         #region Append
         public SafeStringBuilder<T> Append(StringBuilder value)
         {
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + value.Length));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + value.Length));
             internalBuilder.Append(value);
             return this;
         }
@@ -72,7 +72,7 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(UInt16 value)
         {
             internalBuilder.Append(value);
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + 1));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + 1));
             return this;
         }
 
@@ -85,7 +85,7 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(UInt32 value)
         {
             internalBuilder.Append(value);
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + 1));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + 1));
             return this;
         }
 
@@ -98,7 +98,7 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(UInt64 value)
         {
             internalBuilder.Append(value);
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + 1));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + 1));
             return this;
         }
 
@@ -111,7 +111,7 @@ namespace LibProtection.Injections
 
         public SafeStringBuilder<T> Append(char[] value, int startIndex, int charCount)
         {
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + charCount));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + charCount));
             internalBuilder.Append(value, startIndex, charCount);
             return this;
         }
@@ -124,7 +124,7 @@ namespace LibProtection.Injections
 
         public SafeStringBuilder<T> Append(string value)
         {
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + value.Length));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + value.Length));
             internalBuilder.Append(value);
             return this;
         }
@@ -137,7 +137,7 @@ namespace LibProtection.Injections
 
         public SafeStringBuilder<T> Append(string value, int startIndex, int count)
         {
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + count));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + count));
             internalBuilder.Append(value, startIndex, count);
             return this;
         }
@@ -151,11 +151,11 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(Char value, Int32 repeatCount)
         {
             internalBuilder.Append(value, repeatCount);
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + repeatCount));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + repeatCount));
             return this;
         }
 
-        public SafeStringBuilder<T> UnsafeAppend(Char value, Int32 repeatCount)
+        public SafeStringBuilder<T> UncheckedAppend(Char value, Int32 repeatCount)
         {
             internalBuilder.Append(value, repeatCount);
             return this;
@@ -165,11 +165,11 @@ namespace LibProtection.Injections
         {
             var strValue = value.ToString();
             internalBuilder.Append(strValue);
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
             return this;
         }
 
-        public SafeStringBuilder<T> UnchekedAppend(float value)
+        public SafeStringBuilder<T> UncheckedAppend(float value)
         {
             internalBuilder.Append(value);
             return this;
@@ -178,7 +178,7 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(bool value)
         {
             internalBuilder.Append(value);
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + (value ? 4 : 5)));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + (value ? 4 : 5)));
             return this;           
         }
 
@@ -191,7 +191,7 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(char value)
         {
             internalBuilder.Append(value);
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + 1));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + 1));
             return this;
         }
 
@@ -203,7 +203,7 @@ namespace LibProtection.Injections
 
         public SafeStringBuilder<T> Append(char[] value)
         {
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + value.Length));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + value.Length));
             internalBuilder.Append(value);
             return this;
         }
@@ -217,7 +217,7 @@ namespace LibProtection.Injections
         {
             var strValue = value.ToString();
             internalBuilder.Append(strValue);
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
             return this;
         }
 
@@ -231,11 +231,11 @@ namespace LibProtection.Injections
         {
             var strValue = value.ToString();
             internalBuilder.Append(strValue);
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
             return this;
         }
 
-        public SafeStringBuilder<T> UnchekedAppend(byte value)
+        public SafeStringBuilder<T> UncheckedAppend(byte value)
         {
             internalBuilder.Append(value);
             return this;
@@ -245,11 +245,11 @@ namespace LibProtection.Injections
         {
             var strValue = value.ToString();
             internalBuilder.Append(strValue);
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
             return this;
         }
 
-        public SafeStringBuilder<T> UnchekedAppend(Int16 value)
+        public SafeStringBuilder<T> UncheckedAppend(Int16 value)
         {
             internalBuilder.Append(value);
             return this;
@@ -259,11 +259,11 @@ namespace LibProtection.Injections
         {
             var strValue = value.ToString();
             internalBuilder.Append(strValue);
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
             return this;
         }
 
-        public SafeStringBuilder<T> UnchekedAppend(Int32 value)
+        public SafeStringBuilder<T> UncheckedAppend(Int32 value)
         {
             internalBuilder.Append(value);
             return this;
@@ -273,11 +273,11 @@ namespace LibProtection.Injections
         {
             var strValue = value.ToString();
             internalBuilder.Append(strValue);
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
             return this;
         }
 
-        public SafeStringBuilder<T> UnchekedAppend(Int64 value)
+        public SafeStringBuilder<T> UncheckedAppend(Int64 value)
         {
             internalBuilder.Append(value);
             return this;
@@ -287,7 +287,7 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(object value)
         {
             var strValue = value.ToString();
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
             internalBuilder.Append(strValue);
             return this;
         }
@@ -301,7 +301,7 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(double value)
         {
             var strValue = value.ToString();
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
             internalBuilder.Append(strValue);
             return this;
         }
@@ -338,7 +338,7 @@ namespace LibProtection.Injections
 
         public SafeStringBuilder<T> AppendLine(string value)
         {
-            taintedRanges.Add(new Range(internalBuilder.Length, internalBuilder.Length + value.Length));
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + value.Length));
             internalBuilder.AppendLine(value);
             internalBuilder.AppendLine();
             return this;
@@ -365,25 +365,16 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Insert(int index, string value)
         {
             var newRange = new Range(index, index + value.Length);
-            if (TryInsertRange(newRange, out var overlappingRange))
-            {
-                taintedRanges.Remove(overlappingRange);
-                taintedRanges.Add(overlappingRange.ConvexHull(newRange));
-            }
-
+            taintedRanges.SafeInsert(newRange);
+            internalBuilder.Insert(index, value);
             return this;
         }
 
         public SafeStringBuilder<T> UncheckedInsert(int index, string value)
         {
             var newRange = new Range(index, index + value.Length);
-            if (TryInsertRange(newRange, out var overlappingRange))
-            {
-                taintedRanges.Remove(overlappingRange);
-                taintedRanges.Add(new Range(overlappingRange.LowerBound, index - 1));
-                taintedRanges.Add(new Range(index + value.Length, overlappingRange.UpperBound));
-            }
-
+            taintedRanges.UncheckedInsert(newRange);
+            internalBuilder.Insert(index, value);
             return this;
         }
         #endregion Insert
@@ -392,26 +383,8 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Remove(int startIndex, int length)
         {
             var newRange = new Range(startIndex, startIndex + length);
-            if (TryRemoveRange(newRange, out var overlappingRange))
-            {
-                taintedRanges.Remove(overlappingRange);
 
-                if (startIndex < overlappingRange.LowerBound)
-                {
-                    if (startIndex + length < overlappingRange.UpperBound)
-                    {
-                        taintedRanges.Add(new Range(startIndex + length, overlappingRange.UpperBound));
-                    }
-                }
-                else
-                {
-                    taintedRanges.Add(new Range(overlappingRange.LowerBound, startIndex));
-                    if (startIndex + length < overlappingRange.UpperBound)
-                    {
-                        taintedRanges.Add(new Range(startIndex + length, overlappingRange.UpperBound));
-                    }
-                }
-            }
+            taintedRanges.Remove(newRange);
             return this;
 
         }
@@ -421,59 +394,61 @@ namespace LibProtection.Injections
         
         public SafeStringBuilder<T> Replace(string oldValue, string newValue)
         {
-            var newRanges = new List<Range>();
-            var s = internalBuilder.ToString();
-            int index = 0;
-            var rangesOffsets = new Dictionary<Range, int>();
+            throw new NotImplementedException();
 
-            while (true)
-            {
-                index = s.IndexOf(oldValue, startIndex: index);
-                if (index == -1)
-                {
-                    break;
-                }
+            //var newRanges = new List<Range>();
+            //var s = internalBuilder.ToString();
+            //int index = 0;
+            //var rangesOffsets = new Dictionary<Range, int>();
 
-                var rangeToBeReplaced = new Range(index, index + oldValue.Length);
+            //while (true)
+            //{
+            //    index = s.IndexOf(oldValue, startIndex: index);
+            //    if (index == -1)
+            //    {
+            //        break;
+            //    }
 
-                Range newRange = new Range(index, index + newValue.Length); 
-                Range rangeToRemove = default;
+            //    var rangeToBeReplaced = new Range(index, index + oldValue.Length);
 
-                foreach (var existingRange in taintedRanges)
-                {
-                    if (existingRange.Overlaps(rangeToBeReplaced))
-                    {
-                        newRange = GetReplacingRange(rangeToBeReplaced, existingRange, newValue);
-                        rangeToRemove = existingRange;
-                        break;
-                    }
-                }
+            //    Range newRange = new Range(index, index + newValue.Length); 
+            //    Range rangeToRemove = default;
 
-                taintedRanges.Remove(rangeToRemove);
+            //    foreach (var existingRange in taintedRanges)
+            //    {
+            //        if (existingRange.Overlaps(rangeToBeReplaced))
+            //        {
+            //            newRange = GetReplacingRange(rangeToBeReplaced, existingRange, newValue);
+            //            rangeToRemove = existingRange;
+            //            break;
+            //        }
+            //    }
 
-                foreach (var existingRange in taintedRanges)
-                {
-                    if (existingRange > rangeToBeReplaced)
-                    {
-                        rangesOffsets.TryGetValue(existingRange, out var offset);
-                        rangesOffsets[existingRange] = offset + newRange.Length;
-                    }
-                }
+            //    taintedRanges.Remove(rangeToRemove);
 
-                newRanges.Add(newRange);
-                index += oldValue.Length;
-            }
+            //    foreach (var existingRange in taintedRanges)
+            //    {
+            //        if (existingRange > rangeToBeReplaced)
+            //        {
+            //            rangesOffsets.TryGetValue(existingRange, out var offset);
+            //            rangesOffsets[existingRange] = offset + newRange.Length;
+            //        }
+            //    }
 
-            foreach (var rangeOffset in rangesOffsets)
-            {
-                var range = rangeOffset.Key;
-                var offset = rangeOffset.Value;
-                range.Offset(offset);
-            }
+            //    newRanges.Add(newRange);
+            //    index += oldValue.Length;
+            //}
 
-            taintedRanges.AddRange(newRanges);
+            //foreach (var rangeOffset in rangesOffsets)
+            //{
+            //    var range = rangeOffset.Key;
+            //    var offset = rangeOffset.Value;
+            //    range.Offset(offset);
+            //}
 
-            return this;
+            //taintedRanges.AddRange(newRanges);
+
+            //return this;
         }
 
         private Range GetReplacingRange(Range rangeToReplace, Range existingRange, string newValue)
@@ -528,7 +503,7 @@ namespace LibProtection.Injections
         public override string ToString()
         {
             var value = internalBuilder.ToString();
-            var sanitizeResult = LanguageService.TrySanitize(Single<T>.Instance, value, taintedRanges);
+            var sanitizeResult = LanguageService.TrySanitize(Single<T>.Instance, value, taintedRanges.ToList());
 
             if (sanitizeResult.Success)
             {

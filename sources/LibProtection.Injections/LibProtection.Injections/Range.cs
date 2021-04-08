@@ -39,6 +39,16 @@ namespace LibProtection.Injections
                    || Contains(range.UpperBound - 1);
         }
 
+        public bool Touches(Range range)
+        {
+            return Touches(range.LowerBound) || Touches(range.UpperBound);
+        }
+
+        public bool Touches(int point)
+        {
+            return LowerBound-1 <= point && point <= UpperBound;
+        }
+
         public override string ToString()
         {
             return Length != 0 ? $"[{LowerBound}..{UpperBound})" : $"[{LowerBound})";
@@ -52,7 +62,7 @@ namespace LibProtection.Injections
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) { return false; }
-            return obj is Range && Equals((Range) obj);
+            return obj is Range && Equals((Range)obj);
         }
 
         public override int GetHashCode()
@@ -77,6 +87,37 @@ namespace LibProtection.Injections
                 Math.Min(LowerBound, other.LowerBound),
                 Math.Max(UpperBound, other.UpperBound)
                 );
+        }
+
+        /// <summary>
+        /// Substracts range from the current range assuming ranges do overlap. Returns true if substraction splits existing range in two.
+        /// New range is assinged to out parameter newRange.
+        internal bool TrySubstract(Range range, out Range newRange)
+        {
+            if (LowerBound <= range.LowerBound)
+            {
+                var oldUpperBound = UpperBound;
+                UpperBound = range.LowerBound;
+
+                if (oldUpperBound > range.UpperBound)
+                {
+                    newRange = new Range(range.UpperBound, oldUpperBound);
+                    return true;
+                }
+            }
+            else
+            {
+                if (UpperBound > range.UpperBound)
+                {
+                    LowerBound = range.UpperBound;
+                }
+                else
+                {
+                    UpperBound = LowerBound;
+                }
+            }
+            newRange = default;
+            return false;
         }
     }
 }
