@@ -26,8 +26,6 @@ namespace LibProtection.Injections
                 Prev = prev;
                 Next = next;
             }
-
-
         }
 
         Item Head;
@@ -238,8 +236,6 @@ namespace LibProtection.Injections
                     {
                         currentItem = currentItem.Next;
                     }
-
-                    
                 }
                 else
                 {
@@ -267,7 +263,7 @@ namespace LibProtection.Injections
 
             if (currentItem == null)
             {
-                Add(newRange);
+                AddLast(newRange);
                 return;
             }
 
@@ -288,7 +284,7 @@ namespace LibProtection.Injections
                     AddAfter(currentItem, newRange);
                 }
             }
-            
+
             //Offset the rest of the ranges
             while (currentItem != null)
             {
@@ -345,6 +341,108 @@ namespace LibProtection.Injections
         public List<Range> ToList()
         {
             return new List<Range>(this);
+        }
+
+        internal void Replace(string currentString, string oldValue, string newValue)
+        {
+            int index = 0;
+
+            bool TryFindNextRange(out Range rangeToReplace, out Range replacingRange)
+            {
+                index = currentString.IndexOf(oldValue, startIndex: index);
+                if (index == -1)
+                {
+                    rangeToReplace = default;
+                    replacingRange = default;
+                    return false;
+                }
+
+                rangeToReplace = new Range(index, oldValue.Length);
+                replacingRange = new Range(index, newValue.Length);
+                return true;
+            }
+
+            var offsetStep = newValue.Length - oldValue.Length;
+            var offsetValue = 0;
+            var currentItem = Head;
+            Item firstItem = null;
+
+            bool betweenRR = false;
+            bool nextRRExists;
+            Range rangeToBeReplaced;
+            Range newRange;
+
+            while (currentItem != null)
+            {
+                nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
+
+                if (nextRRExists) //There is another range to be replaced
+                {
+                    if (betweenRR) //We haven't reached it yet
+                    {
+                        if (!currentItem.Range.Touches(rangeToBeReplaced)) //We still haven't reached it
+                        {
+                            currentItem.Range.Offset(offsetValue);
+                        }
+                        else //We did reach it
+                        {
+                            firstItem = currentItem; //all item touching rangeToBeReplaced will be merged into this one
+                            currentItem.Range = currentItem.Range.ConvexHull(newRange);
+                            betweenRR = false; //switch scanning mode
+                        }
+
+                        currentItem = currentItem.Next;
+                    }
+                    else //We previously found a range that touches rangeToBeReplaced
+                    {
+                        if (currentItem.Range.Touches(rangeToBeReplaced)) //still touching
+                        {
+                            firstItem.Range = currentItem.Range.ConvexHull(firstItem.Range);
+                            firstItem.Next = currentItem.Next;
+                            if (currentItem.Next != null)
+                            {
+                                currentItem.Next.Prev = firstItem;
+                            }
+                            else
+                            {
+                                Tail = firstItem;
+                            }
+                            currentItem = currentItem.Next;
+                        }
+                        else //current range no longer touches rangeToBeReplaced
+                        {
+                            betweenRR = true;
+
+                            firstItem.Range.Offset(offsetValue);
+                            //Check if we replaced the space between two ranges
+                            if (offsetValue < 0 && firstItem.Prev != null && firstItem.Range.Touches(firstItem.Prev.Range))
+                            {
+                                var prevItem = firstItem.Prev;
+                                prevItem.Range = prevItem.Range.ConvexHull(firstItem.Range);
+                                prevItem.Next = firstItem.Next;
+                                if (prevItem.Next != null)
+                                {
+                                    prevItem.Next.Prev = prevItem;
+                                }
+                                else
+                                {
+                                    Tail = prevItem;
+                                }
+                            }
+
+                            offsetValue += offsetStep;
+                            nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
+                        }
+                    }
+                }
+                else //After processing all rangesToReplace, we only need to offset the of the ranges
+                {
+                    currentItem.Range.Offset(offsetValue);
+                    currentItem = currentItem.Next;
+                }
+                
+            }
+
         }
     }
 }

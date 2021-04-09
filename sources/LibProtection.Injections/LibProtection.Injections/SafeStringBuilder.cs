@@ -179,7 +179,7 @@ namespace LibProtection.Injections
         {
             internalBuilder.Append(value);
             taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + (value ? 4 : 5)));
-            return this;           
+            return this;
         }
 
         public SafeStringBuilder<T> UncheckedAppend(bool value)
@@ -391,114 +391,16 @@ namespace LibProtection.Injections
         #endregion Remove 
 
         #region Replace
-        
+
         public SafeStringBuilder<T> Replace(string oldValue, string newValue)
         {
-            throw new NotImplementedException();
-
-            //var newRanges = new List<Range>();
-            //var s = internalBuilder.ToString();
-            //int index = 0;
-            //var rangesOffsets = new Dictionary<Range, int>();
-
-            //while (true)
-            //{
-            //    index = s.IndexOf(oldValue, startIndex: index);
-            //    if (index == -1)
-            //    {
-            //        break;
-            //    }
-
-            //    var rangeToBeReplaced = new Range(index, index + oldValue.Length);
-
-            //    Range newRange = new Range(index, index + newValue.Length); 
-            //    Range rangeToRemove = default;
-
-            //    foreach (var existingRange in taintedRanges)
-            //    {
-            //        if (existingRange.Overlaps(rangeToBeReplaced))
-            //        {
-            //            newRange = GetReplacingRange(rangeToBeReplaced, existingRange, newValue);
-            //            rangeToRemove = existingRange;
-            //            break;
-            //        }
-            //    }
-
-            //    taintedRanges.Remove(rangeToRemove);
-
-            //    foreach (var existingRange in taintedRanges)
-            //    {
-            //        if (existingRange > rangeToBeReplaced)
-            //        {
-            //            rangesOffsets.TryGetValue(existingRange, out var offset);
-            //            rangesOffsets[existingRange] = offset + newRange.Length;
-            //        }
-            //    }
-
-            //    newRanges.Add(newRange);
-            //    index += oldValue.Length;
-            //}
-
-            //foreach (var rangeOffset in rangesOffsets)
-            //{
-            //    var range = rangeOffset.Key;
-            //    var offset = rangeOffset.Value;
-            //    range.Offset(offset);
-            //}
-
-            //taintedRanges.AddRange(newRanges);
-
-            //return this;
-        }
-
-        private Range GetReplacingRange(Range rangeToReplace, Range existingRange, string newValue)
-        {
-            if (rangeToReplace.Contains(existingRange))
-            {
-                return new Range(rangeToReplace.LowerBound, rangeToReplace.LowerBound + newValue.Length);
-            }
-            else
-            {
-                var offset = newValue.Length - rangeToReplace.Length;
-                if (rangeToReplace.LowerBound < existingRange.LowerBound)
-                {
-                    return new Range(rangeToReplace.LowerBound, existingRange.UpperBound + offset);
-                }
-                else 
-                {
-                    return new Range(existingRange.LowerBound, rangeToReplace.UpperBound + offset);
-                }
-            }
+            var s = internalBuilder.ToString();
+            taintedRanges.Replace(s, oldValue, newValue);
+            internalBuilder.Replace(oldValue, newValue);
+            return this;
         }
 
         #endregion Replace
-        private bool TryInsertRange(Range range, out Range overlappingRange)
-            => TryModifyRanges(range, range.Length, out overlappingRange);
-
-        private bool TryRemoveRange(Range range, out Range overlappingRange)
-            => TryModifyRanges(range, -range.Length, out overlappingRange);
-
-        private bool TryModifyRanges(Range newRange, int offset, out Range overlappingRange)
-        {
-            overlappingRange = default;
-            bool overlappingRangeExists = false;
-            foreach (var range in taintedRanges)
-            {
-                if (range.Overlaps(newRange))
-                {
-                    overlappingRangeExists = true;
-                    overlappingRange = range;
-                }
-                else
-                {
-                    if (range > newRange)
-                    {
-                        range.Offset(offset);
-                    }
-                }
-            }
-            return overlappingRangeExists;
-        }
 
         public override string ToString()
         {
