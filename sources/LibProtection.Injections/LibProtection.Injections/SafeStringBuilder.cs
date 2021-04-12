@@ -72,8 +72,8 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(UInt16 value)
         {
             var strValue = value.ToString();
-            internalBuilder.Append(strValue);
             taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            internalBuilder.Append(strValue);
             return this;
         }
 
@@ -86,8 +86,8 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(UInt32 value)
         {
             var strValue = value.ToString();
-            internalBuilder.Append(strValue);
             taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            internalBuilder.Append(strValue);
             return this;
         }
 
@@ -100,8 +100,8 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(UInt64 value)
         {
             var strValue = value.ToString();
-            internalBuilder.Append(strValue);
             taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            internalBuilder.Append(strValue);
             return this;
         }
 
@@ -153,8 +153,8 @@ namespace LibProtection.Injections
 
         public SafeStringBuilder<T> Append(Char value, Int32 repeatCount)
         {
-            internalBuilder.Append(value, repeatCount);
             taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + repeatCount));
+            internalBuilder.Append(value, repeatCount);
             return this;
         }
 
@@ -167,8 +167,8 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(float value)
         {
             var strValue = value.ToString();
-            internalBuilder.Append(strValue);
             taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            internalBuilder.Append(strValue);
             return this;
         }
 
@@ -180,8 +180,8 @@ namespace LibProtection.Injections
 
         public SafeStringBuilder<T> Append(bool value)
         {
-            internalBuilder.Append(value);
             taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + (value ? 4 : 5)));
+            internalBuilder.Append(value);
             return this;
         }
 
@@ -193,8 +193,8 @@ namespace LibProtection.Injections
 
         public SafeStringBuilder<T> Append(char value)
         {
-            internalBuilder.Append(value);
             taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + 1));
+            internalBuilder.Append(value);
             return this;
         }
 
@@ -219,8 +219,8 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(decimal value)
         {
             var strValue = value.ToString();
-            internalBuilder.Append(strValue);
             taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            internalBuilder.Append(strValue);
             return this;
         }
 
@@ -233,8 +233,8 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(byte value)
         {
             var strValue = value.ToString();
-            internalBuilder.Append(strValue);
             taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            internalBuilder.Append(strValue);
             return this;
         }
 
@@ -247,8 +247,8 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(Int16 value)
         {
             var strValue = value.ToString();
-            internalBuilder.Append(strValue);
             taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            internalBuilder.Append(strValue);
             return this;
         }
 
@@ -261,8 +261,8 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(Int32 value)
         {
             var strValue = value.ToString();
-            internalBuilder.Append(strValue);
             taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            internalBuilder.Append(strValue);
             return this;
         }
 
@@ -275,8 +275,8 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Append(Int64 value)
         {
             var strValue = value.ToString();
-            internalBuilder.Append(strValue);
             taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            internalBuilder.Append(strValue);
             return this;
         }
 
@@ -386,7 +386,6 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Remove(int startIndex, int length)
         {
             var newRange = new Range(startIndex, startIndex + length);
-
             taintedRanges.Remove(newRange);
             return this;
 
