@@ -354,8 +354,8 @@ namespace LibProtection.Injections
                 index = currentString.IndexOf(oldValue, startIndex: index);
                 if (index == -1)
                 {
-                    rangeToReplace = default;
-                    replacingRange = default;
+                    rangeToReplace = new Range();
+                    replacingRange = new Range();
                     return false;
                 }
 

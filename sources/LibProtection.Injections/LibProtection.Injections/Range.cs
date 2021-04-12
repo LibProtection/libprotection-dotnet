@@ -111,7 +111,7 @@ namespace LibProtection.Injections
                     UpperBound = LowerBound;
                 }
             }
-            newRange = default;
+            newRange = new Range();
             return false;
         }
     }
