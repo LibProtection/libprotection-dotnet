@@ -71,8 +71,9 @@ namespace LibProtection.Injections
 
         public SafeStringBuilder<T> Append(UInt16 value)
         {
-            internalBuilder.Append(value);
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + 1));
+            var strValue = value.ToString();
+            internalBuilder.Append(strValue);
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
             return this;
         }
 
@@ -84,8 +85,9 @@ namespace LibProtection.Injections
 
         public SafeStringBuilder<T> Append(UInt32 value)
         {
-            internalBuilder.Append(value);
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + 1));
+            var strValue = value.ToString();
+            internalBuilder.Append(strValue);
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
             return this;
         }
 
@@ -97,8 +99,9 @@ namespace LibProtection.Injections
 
         public SafeStringBuilder<T> Append(UInt64 value)
         {
-            internalBuilder.Append(value);
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + 1));
+            var strValue = value.ToString();
+            internalBuilder.Append(strValue);
+            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
             return this;
         }
 

@@ -91,8 +91,8 @@ namespace LibProtection.Injections.Tests
         {
             var sb = new SafeStringBuilder<Html>();
 
-            sb.UncheckedAppend("<a href={0}");
-            sb.Replace("{0}", "<br> />");
+            sb.UncheckedAppend("<a href={0} />");
+            sb.Replace("{0}", "<br>");
             Assert.Throws<AttackDetectedException>(() => sb.ToString());
         }
 
@@ -101,9 +101,20 @@ namespace LibProtection.Injections.Tests
         {
             var sb = new SafeStringBuilder<Html>();
 
-            sb.UncheckedAppend("<{0} href={1}");
+            sb.UncheckedAppend("<{0} href={1} />");
             sb.Replace("{0}", "a");
-            sb.Replace("{1}", "<br> />");
+            sb.Replace("{1}", "<br>");
+            Assert.Throws<AttackDetectedException>(() => sb.ToString());
+        }
+
+        [Test]
+        public void TestDoubleDoubleReplace()
+        {
+            var sb = new SafeStringBuilder<Html>();
+
+            sb.UncheckedAppend("<{0} href={1} /> </{0}> {1}");
+            sb.Replace("{0}", "a");
+            sb.Replace("{1}", "<br>");
             Assert.Throws<AttackDetectedException>(() => sb.ToString());
         }
     }
