@@ -75,12 +75,6 @@ namespace LibProtection.Injections
             }
         }
 
-        public static bool operator <(Range a, Range b)
-        => a.UpperBound <= b.LowerBound;
-
-        public static bool operator >(Range a, Range b)
-        => a.LowerBound >= b.UpperBound;
-
         public Range ConvexHull(Range other)
         {
             return new Range(
@@ -92,6 +86,7 @@ namespace LibProtection.Injections
         /// <summary>
         /// Substracts range from the current range assuming ranges do overlap. Returns true if substraction splits existing range in two.
         /// New range is assinged to out parameter newRange.
+        /// </summary>
         internal bool TrySubstract(Range range, out Range newRange)
         {
             if (LowerBound <= range.LowerBound)

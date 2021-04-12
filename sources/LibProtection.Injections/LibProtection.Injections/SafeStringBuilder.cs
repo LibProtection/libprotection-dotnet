@@ -286,7 +286,6 @@ namespace LibProtection.Injections
             return this;
         }
 
-
         public SafeStringBuilder<T> Append(object value)
         {
             var strValue = value.ToString();
