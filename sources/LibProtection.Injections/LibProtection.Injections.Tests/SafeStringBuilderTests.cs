@@ -86,5 +86,25 @@ namespace LibProtection.Injections.Tests
             Assert.Throws<AttackDetectedException>(() => sb.ToString());
         }
 
+        [Test]
+        public void TestReplace()
+        {
+            var sb = new SafeStringBuilder<Html>();
+
+            sb.UncheckedAppend("<a href={0}");
+            sb.Replace("{0}", "<br> />");
+            Assert.Throws<AttackDetectedException>(() => sb.ToString());
+        }
+
+        [Test]
+        public void TestDoubleReplace()
+        {
+            var sb = new SafeStringBuilder<Html>();
+
+            sb.UncheckedAppend("<{0} href={1}");
+            sb.Replace("{0}", "a");
+            sb.Replace("{1}", "<br> />");
+            Assert.Throws<AttackDetectedException>(() => sb.ToString());
+        }
     }
 }

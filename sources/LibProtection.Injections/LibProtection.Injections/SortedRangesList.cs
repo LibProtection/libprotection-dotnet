@@ -346,6 +346,8 @@ namespace LibProtection.Injections
         internal void Replace(string currentString, string oldValue, string newValue)
         {
             int index = 0;
+            var offsetStep = newValue.Length - oldValue.Length;
+            var offsetValue = 0;
 
             bool TryFindNextRange(out Range rangeToReplace, out Range replacingRange)
             {
@@ -357,25 +359,25 @@ namespace LibProtection.Injections
                     return false;
                 }
 
-                rangeToReplace = new Range(index, oldValue.Length);
-                replacingRange = new Range(index, newValue.Length);
+                rangeToReplace = new Range(index, index + oldValue.Length);
+                replacingRange = new Range(index, index + offsetValue + newValue.Length);
+                index += oldValue.Length;
                 return true;
             }
 
-            var offsetStep = newValue.Length - oldValue.Length;
-            var offsetValue = 0;
+
             var currentItem = Head;
             Item firstItem = null;
 
-            bool betweenRR = false;
+            bool betweenRR = true;
             bool nextRRExists;
             Range rangeToBeReplaced;
             Range newRange;
 
+            nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
+
             while (currentItem != null)
             {
-                nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
-
                 if (nextRRExists) //There is another range to be replaced
                 {
                     if (betweenRR) //We haven't reached it yet
@@ -440,7 +442,13 @@ namespace LibProtection.Injections
                     currentItem.Range.Offset(offsetValue);
                     currentItem = currentItem.Next;
                 }
-                
+               
+            }
+
+            while (nextRRExists)
+            {
+                AddLast(newRange);
+                nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
             }
 
         }
