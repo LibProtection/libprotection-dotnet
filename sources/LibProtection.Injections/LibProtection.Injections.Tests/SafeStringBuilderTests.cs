@@ -117,5 +117,36 @@ namespace LibProtection.Injections.Tests
             sb.Replace("{1}", "<br>");
             Assert.Throws<AttackDetectedException>(() => sb.ToString());
         }
+
+        [Test]
+        public void TestReplaceThenSafeReplce()
+        {
+            var sb = new SafeStringBuilder<Html>();
+
+            sb.UncheckedAppend("<{0} href='{1}' >Click me!</{0}>");
+            sb.Replace("{0}", "a");
+            sb.Replace("{1}", "default.html");
+            sb.ToString();
+        }
+
+        //[Test]
+        //public void TestTest()
+        //{
+        //    var b = SafeString<Html>.TryFormat("<{0} href='foo'>bar</{0}>", out var newStr, "a", "a");
+        //    Assert.True(b);
+        //}
+
+        [Test]
+        public void TestReplaceEmpty()
+        {
+            var sb = new SafeStringBuilder<Html>();
+
+            sb.UncheckedAppend("<a href=");
+            sb.Append("<b");
+            sb.UncheckedAppend("{0}");
+            sb.Append("r>");
+            sb.Replace("{0}", "");
+            Assert.Throws<AttackDetectedException>(() => sb.ToString());
+        }
     }
 }

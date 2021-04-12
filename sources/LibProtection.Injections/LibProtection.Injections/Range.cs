@@ -6,8 +6,8 @@ namespace LibProtection.Injections
     [DebuggerDisplay("{ToString()}")]
     public struct Range : IEquatable<Range>
     {
-        public int LowerBound { get; private set; }
-        public int UpperBound { get; private set; }
+        public int LowerBound { get; set; }
+        public int UpperBound { get; set; }
         public int Length => UpperBound - LowerBound;
 
         public Range(int lowerBound, int upperBound)

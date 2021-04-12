@@ -360,11 +360,10 @@ namespace LibProtection.Injections
                 }
 
                 rangeToReplace = new Range(index, index + oldValue.Length);
-                replacingRange = new Range(index, index + offsetValue + newValue.Length);
+                replacingRange = new Range(index, index + newValue.Length);
                 index += oldValue.Length;
                 return true;
             }
-
 
             var currentItem = Head;
             Item firstItem = null;
@@ -384,13 +383,88 @@ namespace LibProtection.Injections
                     {
                         if (!currentItem.Range.Touches(rangeToBeReplaced)) //We still haven't reached it
                         {
+                            //if we stepped over rangeToBeReplaced completly
+
+                            if (currentItem.Range.LowerBound >= rangeToBeReplaced.UpperBound)
+                            {
+                                newRange.Offset(offsetValue);
+                                AddBefore(currentItem, newRange);
+
+                                offsetValue += offsetStep;
+                                nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
+                            }
                             currentItem.Range.Offset(offsetValue);
                         }
                         else //We did reach it
                         {
-                            firstItem = currentItem; //all item touching rangeToBeReplaced will be merged into this one
-                            currentItem.Range = currentItem.Range.ConvexHull(newRange);
-                            betweenRR = false; //switch scanning mode
+                            if (newValue.Length == 0)
+                            {
+                                if (currentItem.Range.Overlaps(rangeToBeReplaced))
+                                {
+                                    //TODO: Refactor same code used in Remove method
+                                    #region shared code
+                                    var split = currentItem.Range.TrySubstract(rangeToBeReplaced, out var afterSubstractionRange);
+
+                                    if (split)
+                                    {
+                                        AddAfter(currentItem, newRange);
+                                    }
+
+                                    if (currentItem.Range.Length == 0)
+                                    {
+                                        var prevItem = currentItem.Prev;
+                                        var nextItem = currentItem.Next;
+                                        if (prevItem != null)
+                                        {
+                                            prevItem.Next = nextItem;
+                                        }
+                                        else
+                                        {
+                                            Head = nextItem;
+                                        }
+                                        if (nextItem != null)
+                                        {
+                                            nextItem.Prev = prevItem;
+                                        }
+                                        else
+                                        {
+                                            Tail = prevItem;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        currentItem.Range.Offset(offsetValue);
+                                    }
+                                    #endregion shared code
+
+                                    if (split)
+                                    {
+                                        currentItem = currentItem.Next;
+                                        currentItem.Range.Offset(offsetValue);
+                                    }
+                                    else
+                                    {
+                                        betweenRR = false;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (currentItem.Range.Contains(rangeToBeReplaced)) // only current range has to be directly modified, others need only offset
+                                {
+                                    currentItem.Range.Offset(offsetValue); //offset based on previously modified ranges
+                                    currentItem.Range.UpperBound += offsetValue; //offset upper bound sine
+                                    offsetValue += offsetStep;
+                                    nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
+                                }
+                                else
+                                {
+                                    firstItem = currentItem; //all items touching rangeToBeReplaced will be merged into this one
+                                    currentItem.Range = currentItem.Range.ConvexHull(newRange);
+                                    betweenRR = false; //switch scanning mode
+                                }
+                            }
+
                         }
 
                         currentItem = currentItem.Next;
@@ -442,12 +516,14 @@ namespace LibProtection.Injections
                     currentItem.Range.Offset(offsetValue);
                     currentItem = currentItem.Next;
                 }
-               
+
             }
 
             while (nextRRExists)
             {
+                newRange.Offset(offsetValue);
                 AddLast(newRange);
+                offsetValue += offsetStep;
                 nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
             }
 
