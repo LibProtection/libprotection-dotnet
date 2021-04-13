@@ -390,7 +390,6 @@ namespace LibProtection.Injections
                         if (!currentItem.Range.Touches(rangeToBeReplaced)) //We still haven't reached it
                         {
                             //if we stepped over rangeToBeReplaced completly
-
                             if (currentItem.Range.LowerBound >= rangeToBeReplaced.UpperBound)
                             {
                                 AddBefore(currentItem, newRange.Offset(offsetValue));
@@ -401,58 +400,8 @@ namespace LibProtection.Injections
                         }
                         else //We did reach it
                         {
-                            if (newValue.Length == 0)
-                            {
-                                if (currentItem.Range.Overlaps(rangeToBeReplaced))
-                                {
-                                    var split = currentItem.Range.TrySubstract(rangeToBeReplaced, out var modifiedRange, out var afterSubstractionRange);
-                                    currentItem.Range = modifiedRange;
-
-                                    if (currentItem.Range.Length == 0)
-                                    {
-                                        var prevItem = currentItem.Prev;
-                                        var nextItem = currentItem.Next;
-                                        if (prevItem != null)
-                                        {
-                                            prevItem.Next = nextItem;
-                                        }
-                                        else
-                                        {
-                                            Head = nextItem;
-                                        }
-                                        if (nextItem != null)
-                                        {
-                                            nextItem.Prev = prevItem;
-                                        }
-                                        else
-                                        {
-                                            Tail = prevItem;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        currentItem.Offset(offsetValue);
-                                    }
-                                    betweenRR = false;
-                                }
-                            }
-                            else
-                            {
-                                if (currentItem.Range.Contains(rangeToBeReplaced)) // only current range has to be directly modified, others need only offset
-                                {
-                                    currentItem.Offset(offsetValue); //offset based on previously modified ranges
-                                    currentItem.Range = new Range(currentItem.Range.LowerBound, currentItem.Range.UpperBound + offsetValue); //offset upper bound sine
-                                    offsetValue += offsetStep;
-                                    nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
-                                }
-                                else
-                                {
-                                    firstItem = currentItem; //all items touching rangeToBeReplaced will be merged into this one
-                                    currentItem.Range = currentItem.Range.ConvexHull(newRange);
-                                    betweenRR = false; //switch scanning mode
-                                }
-                            }
-
+                            firstItem = currentItem;
+                            betweenRR = false;
                         }
 
                         currentItem = currentItem.Next;
@@ -477,23 +426,51 @@ namespace LibProtection.Injections
                         {
                             betweenRR = true;
 
-                            firstItem.Offset(offsetValue);
-                            //Check if we replaced the space between two ranges
-                            if (offsetValue < 0 && firstItem.Prev != null && firstItem.Range.Touches(firstItem.Prev.Range))
+                            firstItem.Range = DoMagick(firstItem, rangeToBeReplaced, newRange);
+
+                            if (firstItem.Range.Length == 0)
                             {
                                 var prevItem = firstItem.Prev;
-                                prevItem.Range = prevItem.Range.ConvexHull(firstItem.Range);
-                                prevItem.Next = firstItem.Next;
-                                if (prevItem.Next != null)
+                                var nextItem = firstItem.Next;
+                                if (prevItem != null)
                                 {
-                                    prevItem.Next.Prev = prevItem;
+                                    prevItem.Next = nextItem;
+                                }
+                                else
+                                {
+                                    Head = nextItem;
+                                }
+                                if (nextItem != null)
+                                {
+                                    nextItem.Prev = prevItem;
                                 }
                                 else
                                 {
                                     Tail = prevItem;
                                 }
+                                offsetValue += offsetStep;
                             }
+                            else
+                            {
 
+                                firstItem.Offset(offsetValue);
+
+                                //Check if we replaced the space between two ranges
+                                if (offsetValue < 0 && firstItem.Prev != null && firstItem.Range.Touches(firstItem.Prev.Range))
+                                {
+                                    var prevItem = firstItem.Prev;
+                                    prevItem.Range = prevItem.Range.ConvexHull(firstItem.Range);
+                                    prevItem.Next = firstItem.Next;
+                                    if (prevItem.Next != null)
+                                    {
+                                        prevItem.Next.Prev = prevItem;
+                                    }
+                                    else
+                                    {
+                                        Tail = prevItem;
+                                    }
+                                }
+                            }
                             offsetValue += offsetStep;
                             nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
                         }
@@ -507,13 +484,73 @@ namespace LibProtection.Injections
 
             }
 
-            while (nextRRExists)
+            if (!betweenRR && firstItem != null)
+            {
+                firstItem.Range = DoMagick(firstItem, rangeToBeReplaced, newRange);
+
+                if (firstItem.Range.Length == 0)
+                {
+                    var prevItem = firstItem.Prev;
+                    var nextItem = firstItem.Next;
+                    if (prevItem != null)
+                    {
+                        prevItem.Next = nextItem;
+                    }
+                    else
+                    {
+                        Head = nextItem;
+                    }
+                    if (nextItem != null)
+                    {
+                        nextItem.Prev = prevItem;
+                    }
+                    else
+                    {
+                        Tail = prevItem;
+                    }
+                    offsetValue += offsetStep;
+                }
+                else
+                {
+                    firstItem.Offset(offsetValue);
+                }
+                offsetValue += offsetStep;
+                nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
+            }
+
+            while (nextRRExists && newRange.Length != 0)
             {
                 AddLast(newRange.Offset(offsetValue));
                 offsetValue += offsetStep;
                 nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
             }
 
+        }
+
+        private Range DoMagick(Item firstItem, Range rangeToBeReplaced, Range newRange)
+        {
+            var currentRange = firstItem.Range;
+            var offset = newRange.Length - rangeToBeReplaced.Length;
+            var newLowerBounnd = Math.Min(firstItem.Range.LowerBound, rangeToBeReplaced.LowerBound);
+            int newUpperBound;
+
+            if (currentRange.UpperBound < rangeToBeReplaced.UpperBound)
+            {
+                if (offset > 0)
+                {
+                    newUpperBound = rangeToBeReplaced.UpperBound + offset;
+                }
+                else
+                {
+                    newUpperBound = currentRange.UpperBound + offset;
+                }
+            }
+            else
+            {
+                newUpperBound = currentRange.UpperBound + offset;
+            }
+
+            return new Range(newLowerBounnd, newUpperBound);
         }
     }
 }

@@ -141,5 +141,31 @@ namespace LibProtection.Injections.Tests
             sb.Replace("{0}", "");
             Assert.Throws<AttackDetectedException>(() => sb.ToString());
         }
+
+        [Test]
+        public void TestReplaceTaintedRange()
+        {
+            var sb = new SafeStringBuilder<Html>();
+
+            sb.UncheckedAppend("<a href=");
+            sb.Append("<br>");
+            sb.UncheckedAppend(" />");
+            sb.Replace("<br>", "");
+            sb.ToString();
+        }
+
+        [Test][Ignore("Find a example without an attack injection.")]
+        public void TestReplaceTwoTaintedRanges()
+        {
+            var sb = new SafeStringBuilder<Html>();
+
+            sb.UncheckedAppend("<a href=");
+            sb.Append("<br>");
+            sb.UncheckedAppend(" />");
+            sb.Append("<script>alert(1)");
+            sb.UncheckedAppend("</script>");
+            sb.Replace("<br> /><script>", "/>");
+            sb.ToString();
+        }
     }
 }
