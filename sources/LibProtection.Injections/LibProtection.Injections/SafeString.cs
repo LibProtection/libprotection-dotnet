@@ -5,12 +5,27 @@ using System.Diagnostics;
 
 namespace LibProtection.Injections
 {
+    /// <summary>
+    /// An alternative implementation of the standard functionality of the formatted and interpolated strings. 
+    /// It provides a realtime automatic protection from any class of the injection attacks for strings containg 
+    /// HTML, URL, JavaScript, SQL and the file paths.
+    /// </summary>
+    /// <typeparam name="T">Specifies the grammar of the string.</typeparam>
     public static partial class SafeString<T> where T : LanguageProvider
     {
         // ReSharper disable once StaticMemberInGenericType
         private static readonly RandomizedLRUCache<FormatCacheItem, FormatResult> cache
             = new RandomizedLRUCache<FormatCacheItem, FormatResult>(1024);
 
+        /// <summary>
+        /// Replaces the placeholders in a specified string with the sanitized string representation of a corresponding object in a specified array,
+        /// performing injection attack detection along the way.
+        /// </summary>
+        /// <param name="format">A string with placeholders to be formatted.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        /// <returns>A copy of <paramref name="format"/> in which the placeholders have been replaced by the sanitized string representation
+        /// of the corresponding objects in <paramref name="args"/></returns>
+        /// <exception cref="AttackDetectedException">Injection attack is detected.</exception>
         public static string Format(string format, params object[] args) 
         {
             if (TryFormat(format, out var formatted, args))
@@ -21,6 +36,15 @@ namespace LibProtection.Injections
             throw new AttackDetectedException();
         }
 
+        /// <summary>
+        /// Replaces the placeholders in a specified string with the sanitized string representation of a corresponding object in a specified array,
+        /// performing injection attack detection along the way.
+        /// </summary>
+        /// <param name="format">A string with placeholders to be formatted.</param>
+        /// <param name="formatted">A copy of <paramref name="format"/> in which the placeholders have been replaced by the sanitized string representation 
+        /// of the corresponding objects in <paramref name="args"/> if no attack is detected; otherwise, <c>null</c>. This parameter is passed uninitialized.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        /// <returns><c>true</c> if no attack is detected; otherwise, <c>false</c>.</returns>
         public static bool TryFormat(string format, out string formatted, params object[] args) 
         {
             var formatResult = FormatEx(format, args);
