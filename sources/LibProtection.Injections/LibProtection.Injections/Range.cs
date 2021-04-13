@@ -6,8 +6,8 @@ namespace LibProtection.Injections
     [DebuggerDisplay("{ToString()}")]
     public struct Range : IEquatable<Range>
     {
-        public int LowerBound { get; set; }
-        public int UpperBound { get; set; }
+        public int LowerBound { get; }
+        public int UpperBound { get; }
         public int Length => UpperBound - LowerBound;
 
         public Range(int lowerBound, int upperBound)
@@ -16,11 +16,9 @@ namespace LibProtection.Injections
             UpperBound = upperBound;
         }
 
-        public void Offset(int value)
-        {
-            LowerBound += value;
-            UpperBound += value;
-        }
+        public Range Offset(int value)
+            => new Range(LowerBound + value, UpperBound + value);
+        
 
         public bool Contains(int point)
         {
@@ -84,32 +82,37 @@ namespace LibProtection.Injections
         }
 
         /// <summary>
-        /// Substracts range from the current range assuming ranges do overlap. Returns true if substraction splits existing range in two.
-        /// New range is assinged to out parameter newRange.
+        /// Substraction a ranges from the current one.
         /// </summary>
-        internal bool TrySubstract(Range range, out Range newRange)
+        /// <param name="range">Range to be subtracted from this one.</param>
+        /// <param name="modifiedRange">First part of the range after substraction.</param>
+        /// <param name="newRange">Second part of the range after substraction, if present; otherwise <c>default</c>.</param>
+        /// <returns><c>true</c> If substraction results in two disjoiinted ranges; otherwise, <c>false</c>.</returns>
+        internal bool TrySubstract(Range range, out Range modifiedRange, out Range newRange)
         {
+            if (!Overlaps(range))
+            {
+                modifiedRange = this;
+                newRange = new Range();
+                return false;
+            }
+
             if (LowerBound <= range.LowerBound)
             {
-                var oldUpperBound = UpperBound;
-                UpperBound = range.LowerBound;
+                modifiedRange = new Range(LowerBound, range.LowerBound);
 
-                if (oldUpperBound > range.UpperBound)
+                if (UpperBound > range.UpperBound)
                 {
-                    newRange = new Range(range.UpperBound, oldUpperBound);
+                    newRange = new Range(range.UpperBound, UpperBound);
                     return true;
                 }
             }
             else
             {
-                if (UpperBound > range.UpperBound)
-                {
-                    LowerBound = range.UpperBound;
-                }
-                else
-                {
-                    UpperBound = LowerBound;
-                }
+                var newLowerBound = UpperBound > range.UpperBound ? range.UpperBound : LowerBound;
+                var newUpperBound = UpperBound > range.UpperBound ? UpperBound : LowerBound;
+                
+                modifiedRange = new Range(newLowerBound, newUpperBound);
             }
             newRange = new Range();
             return false;

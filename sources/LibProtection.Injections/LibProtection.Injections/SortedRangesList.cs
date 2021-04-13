@@ -26,6 +26,11 @@ namespace LibProtection.Injections
                 Prev = prev;
                 Next = next;
             }
+
+            public void Offset(int value)
+            {
+                Range = Range.Offset(value);
+            }
         }
 
         Item Head;
@@ -182,7 +187,7 @@ namespace LibProtection.Injections
 
             while (currentItem != null)
             {
-                currentItem.Range.Offset(offset);
+                currentItem.Offset(offset);
                 currentItem = currentItem.Next;
             }
         }
@@ -197,7 +202,8 @@ namespace LibProtection.Injections
             {
                 if (currentItem.Range.Overlaps(range))
                 {
-                    var split = currentItem.Range.TrySubstract(range, out var newRange);
+                    var split = currentItem.Range.TrySubstract(range, out var modifiedRange, out var newRange);
+                    currentItem.Range = modifiedRange;
 
                     if (split)
                     {
@@ -229,7 +235,7 @@ namespace LibProtection.Injections
                     if (split)
                     {
                         currentItem = currentItem.Next;
-                        currentItem.Range.Offset(offset);
+                        currentItem.Offset(offset);
                         currentItem = currentItem.Next;
                     }
                     else
@@ -241,7 +247,7 @@ namespace LibProtection.Injections
                 {
                     if (currentItem.Range.LowerBound > range.UpperBound)
                     {
-                        currentItem.Range.Offset(offset);
+                        currentItem.Offset(offset);
                     }
                     currentItem = currentItem.Next;
                 }
@@ -288,7 +294,7 @@ namespace LibProtection.Injections
             //Offset the rest of the ranges
             while (currentItem != null)
             {
-                currentItem.Range.Offset(offset);
+                currentItem.Offset(offset);
                 currentItem = currentItem.Next;
             }
         }
@@ -311,7 +317,7 @@ namespace LibProtection.Injections
                 {
                     if (currentItem.Range.LowerBound > newRange.LowerBound)
                     {
-                        currentItem.Range.Offset(offset);
+                        currentItem.Offset(offset);
                     }
                 }
                 currentItem = currentItem.Next;
@@ -387,13 +393,11 @@ namespace LibProtection.Injections
 
                             if (currentItem.Range.LowerBound >= rangeToBeReplaced.UpperBound)
                             {
-                                newRange.Offset(offsetValue);
-                                AddBefore(currentItem, newRange);
-
+                                AddBefore(currentItem, newRange.Offset(offsetValue));
                                 offsetValue += offsetStep;
                                 nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
                             }
-                            currentItem.Range.Offset(offsetValue);
+                            currentItem.Offset(offsetValue);
                         }
                         else //We did reach it
                         {
@@ -401,14 +405,8 @@ namespace LibProtection.Injections
                             {
                                 if (currentItem.Range.Overlaps(rangeToBeReplaced))
                                 {
-                                    //TODO: Refactor same code used in Remove method
-                                    #region shared code
-                                    var split = currentItem.Range.TrySubstract(rangeToBeReplaced, out var afterSubstractionRange);
-
-                                    if (split)
-                                    {
-                                        AddAfter(currentItem, newRange);
-                                    }
+                                    var split = currentItem.Range.TrySubstract(rangeToBeReplaced, out var modifiedRange, out var afterSubstractionRange);
+                                    currentItem.Range = modifiedRange;
 
                                     if (currentItem.Range.Length == 0)
                                     {
@@ -433,27 +431,17 @@ namespace LibProtection.Injections
                                     }
                                     else
                                     {
-                                        currentItem.Range.Offset(offsetValue);
+                                        currentItem.Offset(offsetValue);
                                     }
-                                    #endregion shared code
-
-                                    if (split)
-                                    {
-                                        currentItem = currentItem.Next;
-                                        currentItem.Range.Offset(offsetValue);
-                                    }
-                                    else
-                                    {
-                                        betweenRR = false;
-                                    }
+                                    betweenRR = false;
                                 }
                             }
                             else
                             {
                                 if (currentItem.Range.Contains(rangeToBeReplaced)) // only current range has to be directly modified, others need only offset
                                 {
-                                    currentItem.Range.Offset(offsetValue); //offset based on previously modified ranges
-                                    currentItem.Range.UpperBound += offsetValue; //offset upper bound sine
+                                    currentItem.Offset(offsetValue); //offset based on previously modified ranges
+                                    currentItem.Range = new Range(currentItem.Range.LowerBound, currentItem.Range.UpperBound + offsetValue); //offset upper bound sine
                                     offsetValue += offsetStep;
                                     nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
                                 }
@@ -489,7 +477,7 @@ namespace LibProtection.Injections
                         {
                             betweenRR = true;
 
-                            firstItem.Range.Offset(offsetValue);
+                            firstItem.Offset(offsetValue);
                             //Check if we replaced the space between two ranges
                             if (offsetValue < 0 && firstItem.Prev != null && firstItem.Range.Touches(firstItem.Prev.Range))
                             {
@@ -513,7 +501,7 @@ namespace LibProtection.Injections
                 }
                 else //After processing all rangesToReplace, we only need to offset the of the ranges
                 {
-                    currentItem.Range.Offset(offsetValue);
+                    currentItem.Offset(offsetValue);
                     currentItem = currentItem.Next;
                 }
 
@@ -521,8 +509,7 @@ namespace LibProtection.Injections
 
             while (nextRRExists)
             {
-                newRange.Offset(offsetValue);
-                AddLast(newRange);
+                AddLast(newRange.Offset(offsetValue));
                 offsetValue += offsetStep;
                 nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
             }
