@@ -4,51 +4,102 @@ using System.Text;
 
 namespace LibProtection.Injections
 {
+    /// <summary>
+    /// <para>LibProtection.Injections counterpart to the <c>System.Text.StringBuilder</c> class. 
+    /// For every method of the original <c>StringBuilder</c> class <c>LibProtection.Injections.SafeStringBuilder</c> offers two methods:
+    /// e.g. <c>Append(string value)</c> and <c>UnchekedAppend(string value)</c>.
+    /// Methods without the Unchecked prefix assume that the values passed to them can potentially be controlled an attacker.
+    /// On the other hand methods, whose names start with Unchecked, assume that the values passed to them cannot be controlled by an attacker.
+    /// When <c>ToString()</c> is called, <c>SafeStringBuilder</c> detects potential injection attacks within user controlled segments.
+    /// </summary>
+    /// <typeparam name="T">Specifies the grammar of the string.</typeparam>
     public class SafeStringBuilder<T> where T : LanguageProvider
     {
-        private StringBuilder internalBuilder;
-        //TODO: implement sorted storage for taintedRanges
-        //TODO: when new range is added check if it can be merged with one or both of its neighbours
+        private readonly StringBuilder internalBuilder;
         internal readonly SortedRangesList taintedRanges = new SortedRangesList();
 
         #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the LibProtection.Injections.SafeStringBuilder class.
+        /// </summary>
         public SafeStringBuilder()
         {
             internalBuilder = new StringBuilder();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the LibProtection.Injections.SafeStringBuilder class using the specified capacity.
+        /// </summary>
+        /// <param name="capacity">The suggested starting size of this instance.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="capacity"/>capacity is less than zero.</exception>
         public SafeStringBuilder(int capacity)
         {
             internalBuilder = new StringBuilder(capacity);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the LibProtection.Injections.SafeStringBuilder class using the specified string.
+        /// </summary>
+        /// <param name="value">The string used to initialize the value of the instance. If value is <c>null</c>, the 
+        /// new instance will contain the empty string (that is, it contains <c>System.String.Empty</c>).</param>
+        /// <param name="isSafe">Whether the <paramref name="value"/> can be controlled by an attacker. <c>false</c> by default, 
+        /// meaning <paramref name="value"/> is considered attacker controlled.</param>
         public SafeStringBuilder(string value, bool isSafe = false)
         {
             internalBuilder = new StringBuilder(value);
-            if (!isSafe)
+            if (!isSafe && value != null && value.Length != 0)
             {
                 taintedRanges.AddLast(new Range(0, value.Length));
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the LibProtection.Injections.SafeStringBuilder class using the specified capacity and maximum capacity.
+        /// </summary>
+        /// <param name="capacity">The suggested starting size of this instance.</param>
+        /// <param name="maxCapacity">The maximum number of characters the current instance can contain.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException"> 
+        /// <paramref name="maxCapacity"/> is less than one, <paramref name="capacity"/> is less than zero, 
+        /// or <paramref name="capacity"/> is greater than <paramref name="maxCapacity"/>.</exception>
         public SafeStringBuilder(int capacity, int maxCapacity)
         {
             internalBuilder = new StringBuilder(capacity, maxCapacity);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the LibProtection.Injections.SafeStringBuilder class using the specified capacity and maximum capacity.
+        /// </summary>
+        ///<param name="value">The string used to initialize the value of the instance. If value is null, the 
+        /// new instance will contain the empty string (that is, it contains <c>System.String.Empty</c>).</param>
+        /// <param name="capacity">The suggested starting size of this instance.</param>
+        /// <param name="isSafe">Whether the <paramref name="value"/> can be controlled by an attacker. <c>false</c> by default, 
+        /// meaning <paramref name="value"/> is considered attacker controlled.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero"</exception>
         public SafeStringBuilder(string value, int capacity, bool isSafe = false)
         {
             internalBuilder = new StringBuilder(value, capacity);
-            if (!isSafe)
+            if (!isSafe && value != null && value.Length != 0)
             {
                 taintedRanges.AddLast(new Range(0, value.Length));
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the LibProtection.Injections.SafeStringBuilder class from the specified substring and capacity.
+        /// </summary>
+        /// <param name="value">The string used to initialize the value of the instance. If value is null, the 
+        /// new System.Text.StringBuilder will contain the empty string (that is, it contains System.String.Empty).</param>
+        /// <param name="startIndex">The position within <paramref name="value"/> where the substring begins.</param>
+        /// <param name="length">The number of characters in the substring.</param>
+        /// <param name="capacity">The suggested starting size of this instance.</param>
+        /// <param name="isSafe">Whether the substring defined <paramref name="value"/>, <paramref name="startIndex"/> and <paramref name="length"/>
+        /// can be controlled by an attacker. <c>false</c> by default, the substring is considered attacker controlled.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero, 
+        /// or <paramref name="startIndex"/> plus <paramref name="length"/> is not a position within <paramref name="value"/>.</exception>
         public SafeStringBuilder(string value, int startIndex, int length, int capacity, bool isSafe = false)
         {
             internalBuilder = new StringBuilder(value, startIndex, length, capacity);
-            if (!isSafe)
+            if (!isSafe && length != 0)
             {
                 taintedRanges.AddLast(new Range(0, length));
             }
@@ -323,7 +374,7 @@ namespace LibProtection.Injections
             return this;
         }
 
-        public SafeStringBuilder<T> UnsafeAppendFormat(string format, params object[] args)
+        public SafeStringBuilder<T> UncheckedAppendFormat(string format, params object[] args)
         {
             internalBuilder.AppendFormat(format, args);
             return this;
