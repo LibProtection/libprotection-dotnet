@@ -5,12 +5,12 @@ using System.Text;
 namespace LibProtection.Injections
 {
     /// <summary>
-    /// <para>LibProtection.Injections counterpart to the <c>System.Text.StringBuilder</c> class. 
-    /// For every method of the original <c>StringBuilder</c> class <c>LibProtection.Injections.SafeStringBuilder</c> offers two methods:
-    /// e.g. <c>Append(string value)</c> and <c>UnchekedAppend(string value)</c>.
+    /// LibProtection.Injections counterpart to the <see cref="StringBuilder"/> class. 
+    /// For every method of the original <see cref="StringBuilder"/> class <see cref="SafeStringBuilder"/> offers two methods:
+    /// e.g. <see cref="Append(string)"/> and <see cref="UncheckedAppend(string)"/>.
     /// Methods without the Unchecked prefix assume that the values passed to them can potentially be controlled an attacker.
     /// On the other hand methods, whose names start with Unchecked, assume that the values passed to them cannot be controlled by an attacker.
-    /// When <c>ToString()</c> is called, <c>SafeStringBuilder</c> detects potential injection attacks within user controlled segments.
+    /// When <see cref="ToString"/> is called, <see cref="StringBuilder"/> detects potential injection attacks within user controlled segments.
     /// </summary>
     /// <typeparam name="T">Specifies the grammar of the string.</typeparam>
     public class SafeStringBuilder<T> where T : LanguageProvider
@@ -789,7 +789,7 @@ namespace LibProtection.Injections
 
         /// <summary>
         /// Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance.
-        /// Both the string itself and string representation of the arguments are NOT considered to be user controlled for the purpose of attack detection.
+        /// Both the string itself and the string representation of the arguments are NOT considered to be user controlled for the purpose of attack detection.
         /// </summary>
         /// <param name="format">A composite format string.</param>
         /// <param name="args">An array of objects to format.</param>
@@ -893,19 +893,41 @@ namespace LibProtection.Injections
 
         //TODO: add all insert overloads
         #region Insert
+        /// <summary>
+        /// Inserts a string into this instance at the specified character position. 
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The string to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance,
+        /// -or- the current <see cref="Length"/> plus the length of <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, string value)
         {
-            var newRange = new Range(index, index + value.Length);
-            taintedRanges.SafeInsert(newRange);
             internalBuilder.Insert(index, value);
+            if (value != null && value.Length != 0)
+            {
+                taintedRanges.SafeInsert(new Range(index, index + value.Length));
+            }
             return this;
         }
 
+        /// <summary>
+        /// Inserts a string into this instance at the specified character position. 
+        /// The inserted string is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The string to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance,
+        /// -or- the current <see cref="Length"/> plus the length of <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, string value)
         {
-            var newRange = new Range(index, index + value.Length);
-            taintedRanges.UncheckedInsert(newRange);
             internalBuilder.Insert(index, value);
+            if (value != null && value.Length != 0)
+            {
+                taintedRanges.UncheckedInsert(new Range(index, index + value.Length));
+            }
             return this;
         }
         #endregion Insert
@@ -922,10 +944,9 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Remove(int startIndex, int length)
         {
             var newRange = new Range(startIndex, startIndex + length);
-            taintedRanges.Remove(newRange);
             internalBuilder.Remove(startIndex, length);
+            taintedRanges.Remove(newRange);
             return this;
-
         }
         #endregion Remove 
 
@@ -950,7 +971,7 @@ namespace LibProtection.Injections
         #endregion Replace
 
         /// <summary>
-        /// Converst the value of this instance to a <see cref="String"/>.
+        /// Converts the value of this instance to a <see cref="String"/>.
         /// </summary>
         /// <returns>String whose attacker controlled substrings have been sanitized.</returns>
         /// <exception cref="AttackDetectedException">An injection attack was detected.</exception>
