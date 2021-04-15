@@ -54,7 +54,7 @@ namespace LibProtection.Injections
         /// <summary>
         /// Gets the length of the current instance.
         /// </summary>
-        /// <value>THe length of this intance</value>
+        /// <value>THe length of this instance</value>
         /// <exception cref="ArgumentOutOfRangeException">The value specified for a set operation is less than zero or greater than <see cref="MaxCapacity"/>.</exception>
         public int Length
         {
@@ -764,7 +764,7 @@ namespace LibProtection.Injections
         /// <returns>A reference to this instance with <paramref name="format"/> appended. Each format item in <paramref name="format"/> is replaced 
         /// by the string representation of the corresponding object argument.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <c>null</c>.</exception>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid or the index of a fromat item is less than 0 (zero), or
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid or the index of a format item is less than 0 (zero), or
         /// greater than or equal to length of the <paramref name="args"/> array.</exception>
         /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> AppendFormat(string format, params object[] args)
@@ -898,7 +898,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="index">The position in this instance where insertion begins.</param>
         /// <param name="value">The string to insert.</param>
-        /// <param name="count">The numnber of time two insert <paramref name="value"/>.</param>
+        /// <param name="count">The number of time two insert <paramref name="value"/>.</param>
         /// <returns>A reference to this instance after the insert operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance,
         /// -or- the current <see cref="Length"/> plus the length of <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.</exception>
@@ -920,7 +920,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="index">The position in this instance where insertion begins.</param>
         /// <param name="value">The string to insert.</param>
-        /// <param name="count">The numnber of time two insert <paramref name="value"/>.</param>
+        /// <param name="count">The number of time two insert <paramref name="value"/>.</param>
         /// <returns>A reference to this instance after the insert operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance,
         /// -or- the current <see cref="Length"/> plus the length of <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.</exception>
@@ -1152,9 +1152,9 @@ namespace LibProtection.Injections
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Replace(string oldValue, string newValue)
         {
-            var s = internalBuilder.ToString();
-            taintedRanges.Replace(s, oldValue, newValue);
+            var str = internalBuilder.ToString();
             internalBuilder.Replace(oldValue, newValue);
+            taintedRanges.Replace(str, oldValue, newValue);
             return this;
         }
 
