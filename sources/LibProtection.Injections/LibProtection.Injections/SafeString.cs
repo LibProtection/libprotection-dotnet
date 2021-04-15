@@ -7,7 +7,7 @@ namespace LibProtection.Injections
 {
     /// <summary>
     /// An alternative implementation of the standard functionality of the formatted and interpolated strings. 
-    /// It provides a realtime automatic protection from any class of the injection attacks for strings containg 
+    /// It provides a real-time automatic protection from any class of the injection attacks for strings containing 
     /// HTML, URL, JavaScript, SQL and the file paths.
     /// </summary>
     /// <typeparam name="T">Specifies the grammar of the string.</typeparam>
