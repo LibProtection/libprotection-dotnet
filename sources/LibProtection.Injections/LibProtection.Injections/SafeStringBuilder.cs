@@ -18,6 +18,61 @@ namespace LibProtection.Injections
         private readonly StringBuilder internalBuilder;
         internal readonly SortedRangesList taintedRanges = new SortedRangesList();
 
+        #region Properties
+        /// <summary>
+        /// Gets or sets the maximum number of characters that can be contained in the memory allocated by the current instance.
+        /// </summary>
+        /// <value>The maximum number of characters that can be contained in the memory allocated by the current instance. 
+        /// Its value can range from <see cref="Length"/> to <see cref="MaxCapacity"/>.</value>
+        /// <exception cref="ArgumentOutOfRangeException">The value specified for a set operation is less than the current length of this instance.
+        /// -or- The value specified for a set operation is greater than the maximum capacity.</exception>
+        public int Capacity 
+        { 
+            get 
+                { 
+                    return internalBuilder.Capacity; 
+            } 
+            set 
+            { 
+                internalBuilder.Capacity = value; 
+            } 
+        }
+
+        /// <summary>
+        /// Gets the character at the specified character position in this instance.
+        /// </summary>
+        /// <param name="index">The position of the character.</param>
+        /// <value>The Unicode character at position index <paramref name="index"/>.</value>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is outside the bounds of this instance while setting a character.</exception>
+        /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is outside the bounds of this instance while getting a character.</exception>
+        public char this[int index]
+        {
+            get { return internalBuilder[index]; }
+            //TODO add set when replace at position is implemented
+        }
+
+        /// <summary>
+        /// Gets the length of the current instance.
+        /// </summary>
+        /// <value>THe length of this intance</value>
+        /// <exception cref="ArgumentOutOfRangeException">The value specified for a set operation is less than zero or greater than <see cref="MaxCapacity"/>.</exception>
+        public int Length
+        {
+            get { return internalBuilder.Length; }
+            //TODO: add set 
+        }
+
+        /// <summary>
+        /// Gets the maximum capacity of this instance.
+        /// </summary>
+        /// <value>The maximum number of characters this instance can hold.</value>
+        public int MaxCapacity 
+        { 
+            get { return internalBuilder.MaxCapacity; } 
+        }
+
+        #endregion Properties
+
         #region Constructors
         /// <summary>
         /// Initializes a new instance of the LibProtection.Injections.SafeStringBuilder class.
@@ -113,7 +168,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The string builder to append.</param>
         /// <returns>A reference to this instance after the append operation is completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(StringBuilder value)
         {
             var length = internalBuilder.Length;
@@ -132,7 +187,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The string builder to append.</param>
         /// <returns>A reference to this instance after the append operation is completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(StringBuilder value)
         {
             internalBuilder.Append(value);
@@ -145,7 +200,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The 16-bit unsigned integer to append.</param>
         /// <returns>A reference to this instance after the append operation is completed.</returns>\
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(UInt16 value)
         {
             var strValue = value.ToString();
@@ -161,7 +216,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The 16-bit unsigned integer to append.</param>
         /// <returns>A reference to this instance after the append operation is completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(UInt16 value)
         {
             internalBuilder.Append(value);
@@ -174,7 +229,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The 32-bit unsigned integer to append.</param>
         /// <returns>A reference to this instance after the append operation is completed.</returns>
-		/// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+		/// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(UInt32 value)
         {
             var strValue = value.ToString();
@@ -190,7 +245,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The 32-bit unsigned integer to append.</param>
         /// <returns>A reference to this instance after the append operation is completed.</returns>
-		/// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+		/// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(UInt32 value)
         {
             internalBuilder.Append(value);
@@ -203,7 +258,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The 64-bit unsigned integer to append.</param>
         /// <returns>A reference to this instance after the append operation is completed.</returns>
-		/// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+		/// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(UInt64 value)
         {
             var strValue = value.ToString();
@@ -219,7 +274,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The 64-bit unsigned integer to append.</param>
         /// <returns>A reference to this instance after the append operation is completed.</returns>
-		/// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+		/// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(UInt64 value)
         {
             internalBuilder.Append(value);
@@ -238,7 +293,7 @@ namespace LibProtection.Injections
         /// and <paramref name="startIndex"/> and <paramref name="charCount"/> are not zero</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="charCount"/> is less than zero. -or- <paramref name="startIndex"/> is less than zero. 
         /// -or- <paramref name="startIndex"/>+<paramref name="charCount"/> is greater than the length of <paramref name="value"/>. 
-        /// -or- Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// -or- Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(char[] value, int startIndex, int charCount)
         {
             int length = internalBuilder.Length;
@@ -262,7 +317,7 @@ namespace LibProtection.Injections
         /// and <paramref name="startIndex"/> and <paramref name="charCount"/> are not zero</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="charCount"/> is less than zero. -or- <paramref name="startIndex"/> is less than zero. 
         /// -or- <paramref name="startIndex"/>+<paramref name="charCount"/> is greater than the length of <paramref name="value"/>. 
-        /// -or- Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// -or- Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(char[] value, int startIndex, int charCount)
         {
             internalBuilder.Append(value, startIndex, charCount);
@@ -274,7 +329,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">A string to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(string value)
         {
             var length = internalBuilder.Length;
@@ -291,7 +346,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The string to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(string value)
         {
             internalBuilder.Append(value);
@@ -309,7 +364,7 @@ namespace LibProtection.Injections
         /// and <paramref name="startIndex"/> and <paramref name="charCount"/> are not zero</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="charCount"/> is less than zero. -or- <paramref name="startIndex"/> is less than zero. 
         /// -or- <paramref name="startIndex"/>+<paramref name="charCount"/> is greater than the length of <paramref name="value"/>. 
-        /// -or- Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// -or- Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(string value, int startIndex, int count)
         {
             var length = internalBuilder.Length;
@@ -332,7 +387,7 @@ namespace LibProtection.Injections
         /// and <paramref name="startIndex"/> and <paramref name="charCount"/> are not zero</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="charCount"/> is less than zero. -or- <paramref name="startIndex"/> is less than zero. 
         /// -or- <paramref name="startIndex"/>+<paramref name="charCount"/> is greater than the length of <paramref name="value"/>. 
-        /// -or- Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// -or- Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(string value, int startIndex, int count)
         {
             internalBuilder.Append(value, startIndex, count);
@@ -347,7 +402,7 @@ namespace LibProtection.Injections
         /// <param name="repeatCount">The number of times to append <paramref name="value"/>.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="repeatCount"/> is less than zero.
-        /// -or- Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// -or- Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         /// <exception cref="OutOfMemoryException">Out of memory.</exception>
         public SafeStringBuilder<T> Append(Char value, Int32 repeatCount)
         {
@@ -368,7 +423,7 @@ namespace LibProtection.Injections
         /// <param name="repeatCount">The number of times to append <paramref name="value"/>.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="repeatCount"/> is less than zero.
-        /// -or- Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// -or- Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         /// <exception cref="OutOfMemoryException">Out of memory.</exception>
         public SafeStringBuilder<T> UncheckedAppend(Char value, Int32 repeatCount)
         {
@@ -382,7 +437,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(float value)
         {
             var strValue = value.ToString();
@@ -398,7 +453,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(float value)
         {
             internalBuilder.Append(value);
@@ -411,7 +466,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(bool value)
         {
             var length = internalBuilder.Length;
@@ -426,7 +481,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(bool value)
         {
             internalBuilder.Append(value);
@@ -439,7 +494,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(char value)
         {
             var length = internalBuilder.Length;
@@ -454,7 +509,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The UTF-16-encoded code unit to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(char value)
         {
             internalBuilder.Append(value);
@@ -467,7 +522,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The array of characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(char[] value)
         {
             var length = internalBuilder.Length;
@@ -485,7 +540,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The array of characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(char[] value)
         {
             internalBuilder.Append(value);
@@ -498,7 +553,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The decimal number to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(decimal value)
         {
             var strValue = value.ToString();
@@ -514,7 +569,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The decimal number to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UnchekedAppend(decimal value)
         {
             internalBuilder.Append(value);
@@ -527,7 +582,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(byte value)
         {
             var strValue = value.ToString();
@@ -543,7 +598,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(byte value)
         {
             internalBuilder.Append(value);
@@ -556,7 +611,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(Int16 value)
         {
             var strValue = value.ToString();
@@ -572,7 +627,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(Int16 value)
         {
             internalBuilder.Append(value);
@@ -585,7 +640,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(Int32 value)
         {
             var strValue = value.ToString();
@@ -601,7 +656,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(Int32 value)
         {
             internalBuilder.Append(value);
@@ -614,7 +669,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(Int64 value)
         {
             var strValue = value.ToString();
@@ -630,7 +685,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(Int64 value)
         {
             internalBuilder.Append(value);
@@ -643,7 +698,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The object to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(object value)
         {
             var strValue = value.ToString();
@@ -662,7 +717,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The object to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(object value)
         {
             internalBuilder.Append(value);
@@ -675,7 +730,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Append(double value)
         {
             var strValue = value.ToString();
@@ -691,7 +746,7 @@ namespace LibProtection.Injections
         /// </summary>
         /// <param name="value">The value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppend(double value)
         {
             internalBuilder.Append(value);
