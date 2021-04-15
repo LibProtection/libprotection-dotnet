@@ -74,7 +74,7 @@ namespace LibProtection.Injections
         /// <param name="capacity">The suggested starting size of this instance.</param>
         /// <param name="isSafe">Whether the <paramref name="value"/> can be controlled by an attacker. <c>false</c> by default, 
         /// meaning <paramref name="value"/> is considered attacker controlled.</param>
-        /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero"</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero."</exception>
         public SafeStringBuilder(string value, int capacity, bool isSafe = false)
         {
             internalBuilder = new StringBuilder(value, capacity);
@@ -107,258 +107,591 @@ namespace LibProtection.Injections
         #endregion constructors
 
         #region Append
+        /// <summary>
+        /// Appends the string representation of a specified string builder to this instance. 
+        /// The content of the string builder is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The string builder to append.</param>
+        /// <returns>A reference to this instance after the append operation is completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(StringBuilder value)
         {
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + value.Length));
+            var length = internalBuilder.Length;
             internalBuilder.Append(value);
+            if (value != null && value.Length != 0)
+            {
+                taintedRanges.AddLast(new Range(length, length + value.Length));
+            }
+
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified string builder to this instance.
+        /// The content of the string builder is NOT considered to be user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The string builder to append.</param>
+        /// <returns>A reference to this instance after the append operation is completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(StringBuilder value)
         {
             internalBuilder.Append(value);
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified a specified 16-bit unsigned integer to this instance. 
+        /// This representation is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The 16-bit unsigned integer to append.</param>
+        /// <returns>A reference to this instance after the append operation is completed.</returns>\
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(UInt16 value)
         {
             var strValue = value.ToString();
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            var length = internalBuilder.Length;
             internalBuilder.Append(strValue);
+            taintedRanges.AddLast(new Range(length, length + strValue.Length));
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified a specified 16-bit unsigned integer to this instance. 
+        /// This representation is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The 16-bit unsigned integer to append.</param>
+        /// <returns>A reference to this instance after the append operation is completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(UInt16 value)
         {
             internalBuilder.Append(value);
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified a specified 32-bit unsigned integer to this instance. 
+        /// This representation is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The 32-bit unsigned integer to append.</param>
+        /// <returns>A reference to this instance after the append operation is completed.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(UInt32 value)
         {
             var strValue = value.ToString();
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            var length = internalBuilder.Length;
             internalBuilder.Append(strValue);
+            taintedRanges.AddLast(new Range(length, length + strValue.Length));
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified a specified 32-bit unsigned integer to this instance. 
+        /// This representation is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The 32-bit unsigned integer to append.</param>
+        /// <returns>A reference to this instance after the append operation is completed.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(UInt32 value)
         {
             internalBuilder.Append(value);
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified a specified 64-bit unsigned integer to this instance. 
+        /// This representation is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The 64-bit unsigned integer to append.</param>
+        /// <returns>A reference to this instance after the append operation is completed.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(UInt64 value)
         {
             var strValue = value.ToString();
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            var length = internalBuilder.Length;
             internalBuilder.Append(strValue);
+            taintedRanges.AddLast(new Range(length, length + strValue.Length));
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified a specified 64-bit unsigned integer to this instance. 
+        /// This representation is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The 64-bit unsigned integer to append.</param>
+        /// <returns>A reference to this instance after the append operation is completed.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(UInt64 value)
         {
             internalBuilder.Append(value);
             return this;
         }
 
-
+        /// <summary>
+        /// Appends the string representation of a specified subarray of Unicode characters to this instance. 
+        /// Appended subarray is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">A character array.</param>
+        /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
+        /// <param name="charCount">The number of characters to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, 
+        /// and <paramref name="startIndex"/> and <paramref name="charCount"/> are not zero</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="charCount"/> is less than zero. -or- <paramref name="startIndex"/> is less than zero. 
+        /// -or- <paramref name="startIndex"/>+<paramref name="charCount"/> is greater than the length of <paramref name="value"/>. 
+        /// -or- Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(char[] value, int startIndex, int charCount)
         {
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + charCount));
+            int length = internalBuilder.Length;
             internalBuilder.Append(value, startIndex, charCount);
+            if (charCount != 0)
+            {
+                taintedRanges.AddLast(new Range(length, length + charCount));
+            }
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified subarray of Unicode characters to this instance. 
+        /// Appended subarray is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">A character array.</param>
+        /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
+        /// <param name="charCount">The number of characters to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, 
+        /// and <paramref name="startIndex"/> and <paramref name="charCount"/> are not zero</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="charCount"/> is less than zero. -or- <paramref name="startIndex"/> is less than zero. 
+        /// -or- <paramref name="startIndex"/>+<paramref name="charCount"/> is greater than the length of <paramref name="value"/>. 
+        /// -or- Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(char[] value, int startIndex, int charCount)
         {
             internalBuilder.Append(value, startIndex, charCount);
             return this;
         }
 
+        /// <summary>
+        /// Appends the specified string to this instance. Appended string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">A string to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(string value)
         {
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + value.Length));
+            var length = internalBuilder.Length;
             internalBuilder.Append(value);
+            if (value != null && value.Length != 0)
+            {
+                taintedRanges.AddLast(new Range(length, length + value.Length));
+            }
             return this;
         }
 
+        /// <summary>
+        /// Appends the specified string to this instance. Appended string is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The string to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(string value)
         {
             internalBuilder.Append(value);
             return this;
         }
 
+        /// <summary>
+        /// Appends a copy of a specified substring to this instance. Appended substring is considered user controlled for the purpose of attack detection. 
+        /// </summary>
+        /// <param name="value">The string that contains the substring to append.</param>
+        /// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
+        /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, 
+        /// and <paramref name="startIndex"/> and <paramref name="charCount"/> are not zero</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="charCount"/> is less than zero. -or- <paramref name="startIndex"/> is less than zero. 
+        /// -or- <paramref name="startIndex"/>+<paramref name="charCount"/> is greater than the length of <paramref name="value"/>. 
+        /// -or- Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(string value, int startIndex, int count)
         {
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + count));
+            var length = internalBuilder.Length;
             internalBuilder.Append(value, startIndex, count);
+            if (count != 0)
+            {
+                taintedRanges.AddLast(new Range(length, length + count));
+            }
             return this;
         }
 
+        /// <summary>
+        /// Appends a copy of a specified substring to this instance. Appended substring is NOT considered user controlled for the purpose of attack detection. 
+        /// </summary>
+        /// <param name="value">The string that contains the substring to append.</param>
+        /// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
+        /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, 
+        /// and <paramref name="startIndex"/> and <paramref name="charCount"/> are not zero</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="charCount"/> is less than zero. -or- <paramref name="startIndex"/> is less than zero. 
+        /// -or- <paramref name="startIndex"/>+<paramref name="charCount"/> is greater than the length of <paramref name="value"/>. 
+        /// -or- Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(string value, int startIndex, int count)
         {
             internalBuilder.Append(value, startIndex, count);
             return this;
         }
 
+        /// <summary>
+        /// Appends a specified number of copies of the string representation of a Unicode character to this instance.
+        /// Appended segment is considered user controlled for the purpose of attack detection.  
+        /// </summary>
+        /// <param name="value">The character to append.</param>
+        /// <param name="repeatCount">The number of times to append <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="repeatCount"/> is less than zero.
+        /// -or- Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="OutOfMemoryException">Out of memory.</exception>
         public SafeStringBuilder<T> Append(Char value, Int32 repeatCount)
         {
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + repeatCount));
+            var length = internalBuilder.Length;
             internalBuilder.Append(value, repeatCount);
+            if (repeatCount != 0)
+            {
+                taintedRanges.AddLast(new Range(length, length + repeatCount));
+            }
             return this;
         }
 
+        /// <summary>
+        /// Appends a specified number of copies of the string representation of a Unicode character to this instance.
+        /// Appended segment is NOT considered user controlled for the purpose of attack detection.  
+        /// </summary>
+        /// <param name="value">The character to append.</param>
+        /// <param name="repeatCount">The number of times to append <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="repeatCount"/> is less than zero.
+        /// -or- Enlarging the value of this instance would exceed MaxCapacity.</exception>
+        /// <exception cref="OutOfMemoryException">Out of memory.</exception>
         public SafeStringBuilder<T> UncheckedAppend(Char value, Int32 repeatCount)
         {
             internalBuilder.Append(value, repeatCount);
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified single-precision floating-point number to this instance. 
+        /// Appended characters are considered user controlled for the purpose of attack detection.  
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(float value)
         {
             var strValue = value.ToString();
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            var length = internalBuilder.Length;
             internalBuilder.Append(strValue);
+            taintedRanges.AddLast(new Range(length, length + strValue.Length));
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified single-precision floating-point number to this instance. 
+        /// Appended characters are NOT considered user controlled for the purpose of attack detection.  
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(float value)
         {
             internalBuilder.Append(value);
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified <see cref="Boolean"/> value to this instance. 
+        /// Appended representation is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(bool value)
         {
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + (value ? 4 : 5)));
+            var length = internalBuilder.Length;
             internalBuilder.Append(value);
+            taintedRanges.AddLast(new Range(length, length + (value ? 4 : 5)));
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified <see cref="Boolean"/> value to this instance. 
+        /// Appended representation is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(bool value)
         {
             internalBuilder.Append(value);
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified <see cref="Char"/> value to this instance. 
+        /// Appended representation is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(char value)
         {
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + 1));
+            var length = internalBuilder.Length;
             internalBuilder.Append(value);
+            taintedRanges.AddLast(new Range(length, length + 1));
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified <see cref="Char"/> value to this instance. 
+        /// Appended representation is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The UTF-16-encoded code unit to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(char value)
         {
             internalBuilder.Append(value);
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of the Unicode characters in a specified array to this instance. 
+        /// Appended representation is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The array of characters to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(char[] value)
         {
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + value.Length));
+            var length = internalBuilder.Length;
             internalBuilder.Append(value);
+            if (value != null && value.Length != 0)
+            {
+                taintedRanges.AddLast(new Range(length, length + value.Length));
+            }
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of the Unicode characters in a specified array to this instance. 
+        /// Appended representation is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The array of characters to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(char[] value)
         {
             internalBuilder.Append(value);
             return this;
         }
+
+        /// <summary>
+        /// Appends the string representation of a specified decimal number to this instance. 
+        /// Appended representation is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The decimal number to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(decimal value)
         {
             var strValue = value.ToString();
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            var length = internalBuilder.Length;
             internalBuilder.Append(strValue);
+            taintedRanges.AddLast(new Range(length, length + strValue.Length));
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified decimal number to this instance. 
+        /// Appended representation is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The decimal number to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UnchekedAppend(decimal value)
         {
             internalBuilder.Append(value);
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified 8-bit unsigned integer to this instance. 
+        /// Appended representation is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(byte value)
         {
             var strValue = value.ToString();
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            var length = internalBuilder.Length;
             internalBuilder.Append(strValue);
+            taintedRanges.AddLast(new Range(length, length + strValue.Length));
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified 8-bit unsigned integer to this instance. 
+        /// Appended representation is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(byte value)
         {
             internalBuilder.Append(value);
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified 16-bit signed integer to this instance. 
+        /// Appended representation is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(Int16 value)
         {
             var strValue = value.ToString();
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            var length = internalBuilder.Length;
             internalBuilder.Append(strValue);
+            taintedRanges.AddLast(new Range(length, length + strValue.Length));
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified 16-bit signed integer to this instance. 
+        /// Appended representation is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(Int16 value)
         {
             internalBuilder.Append(value);
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified 32-bit signed integer to this instance. 
+        /// Appended representation is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(Int32 value)
         {
             var strValue = value.ToString();
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            var length = internalBuilder.Length;
             internalBuilder.Append(strValue);
+            taintedRanges.AddLast(new Range(length, length + strValue.Length));
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified 32-bit signed integer to this instance. 
+        /// Appended representation is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(Int32 value)
         {
             internalBuilder.Append(value);
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified 64-bit signed integer to this instance. 
+        /// Appended representation is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(Int64 value)
         {
             var strValue = value.ToString();
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            var length = internalBuilder.Length;
             internalBuilder.Append(strValue);
+            taintedRanges.AddLast(new Range(length, length + strValue.Length));
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified 64-bit signed integer to this instance. 
+        /// Appended representation is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(Int64 value)
         {
             internalBuilder.Append(value);
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified object to this instance.
+        /// Appended representation is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The object to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(object value)
         {
             var strValue = value.ToString();
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            var length = internalBuilder.Length;
             internalBuilder.Append(strValue);
+            if (strValue.Length != 0)
+            {
+                taintedRanges.AddLast(new Range(length, length + strValue.Length));
+            }
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified object to this instance.
+        /// Appended representation is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The object to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(object value)
         {
             internalBuilder.Append(value);
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified double-precision floating-point number to this instance.
+        /// Appended representation is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> Append(double value)
         {
             var strValue = value.ToString();
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + strValue.Length));
+            var length = internalBuilder.Length;
             internalBuilder.Append(strValue);
+            taintedRanges.AddLast(new Range(length, length + strValue.Length));
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified double-precision floating-point number to this instance.
+        /// Appended representation is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed MaxCapacity.</exception>
         public SafeStringBuilder<T> UncheckedAppend(double value)
         {
             internalBuilder.Append(value);
