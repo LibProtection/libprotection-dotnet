@@ -39,6 +39,14 @@ namespace LibProtection.Injections.Tests
         }
 
         [Test]
+        public void TestAppendFormat()
+        {
+            var sb = new SafeStringBuilder<Html>();
+            sb.AppendFormat("<a href={0} />", "</br>");
+            Assert.Throws<AttackDetectedException>(() => sb.ToString());
+        }
+
+        [Test]
         public void TestInsert()
         {
             var sb = new SafeStringBuilder<Html>();

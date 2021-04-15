@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using LibProtection.Injections.Formatting;
+using System;
 using System.Text;
 
 namespace LibProtection.Injections
@@ -755,37 +755,108 @@ namespace LibProtection.Injections
         #endregion Append
 
         #region AppendFormat
-
+        /// <summary>
+        /// Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance.
+        /// The string itself is NOT considered to be user controlled for the purpose of attack detection, while string representation of the arguments are.
+        /// </summary>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="args">An array of objects to format.</param>
+        /// <returns>A reference to this instance with <paramref name="format"/> appended. Each format item in <paramref name="format"/> is replaced 
+        /// by the string representation of the corresponding object argument.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid or the index of a fromat item is less than 0 (zero), or
+        /// greater than or equal to length of the <paramref name="args"/> array.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> AppendFormat(string format, params object[] args)
         {
-            internalBuilder.Append(SafeString<T>.Format(format, args));
+            if (format == null || args == null)
+            {
+                throw new ArgumentNullException("One of the arguments is null.");
+            }
+
+            var formattedString = Formatter.Format(format, args, out var newTaintedRanges, out var _);
+            internalBuilder.Append(formattedString);
+            foreach (var taintedRange in newTaintedRanges)
+            {
+                if (taintedRange.Length != 0)
+                {
+                    taintedRanges.AddLast(taintedRange);
+                }
+            }
+
             return this;
         }
 
+        /// <summary>
+        /// Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance.
+        /// Both the string itself and string representation of the arguments are NOT considered to be user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="args">An array of objects to format.</param>
+        /// <returns>A reference to this instance with <paramref name="format"/> appended. Each format item in <paramref name="format"/> is replaced 
+        /// by the string representation of the corresponding object argument.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid or the index of a fromat item is less than 0 (zero), or
+        /// greater than or equal to length of the <paramref name="args"/> array.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedAppendFormat(string format, params object[] args)
         {
             internalBuilder.AppendFormat(format, args);
             return this;
         }
 
+        //TODO: add all AppendFormat overloads
         #endregion AppendFormat
 
         #region AppendLine
+        /// <summary>
+        /// Appends the default line terminator to the end of the current instance.
+        /// </summary>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> AppendLine()
         {
             internalBuilder.AppendLine();
             return this;
         }
 
+        /// <summary>
+        /// Appends a copy of the specified string followed by the default line terminator to the end of the current instance.
+        /// Appended string is considered user controlled for the purpose of attack detection, while the line terminator is not.
+        /// </summary>
+        /// <param name="value">The string to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
+
         public SafeStringBuilder<T> AppendLine(string value)
         {
-            taintedRanges.AddLast(new Range(internalBuilder.Length, internalBuilder.Length + value.Length));
+            var length = internalBuilder.Length;
             internalBuilder.AppendLine(value);
-            internalBuilder.AppendLine();
+            if (value != null && value.Length != 0)
+            {
+                taintedRanges.AddLast(new Range(length, length + value.Length));
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Appends a copy of the specified string followed by the default line terminator to the end of the current instance.
+        /// Appended string and line terminator are NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="value">The string to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
+        public SafeStringBuilder<T> UnsafeAppendLine(string value)
+        {
+            internalBuilder.AppendLine(value);
             return this;
         }
         #endregion AppendLine
 
+        /// <summary>
+        /// Removes all characters from the current instance.
+        /// </summary>
+        /// <returns>An instance whose <see cref="Length"/> is 0 (zero).</returns>
         public SafeStringBuilder<T> Clear()
         {
             taintedRanges.Clear();
@@ -793,11 +864,30 @@ namespace LibProtection.Injections
             return this;
         }
 
+        /// <summary>
+        /// Copies the characters from a specified segment of this instance to a specified segment of a destination <see cref="Char"/> array.
+        /// </summary>
+        /// <param name="sourceIndex">The starting position in this instance where characters will be copied from. The index is zero-based.</param>
+        /// <param name="destination">The array where characters will be copied.</param>
+        /// <param name="destinationIndex">The starting position in <paramref name="destination"/> where characters will be copied. The index is zero-based.</param>
+        /// <param name="count">The number of characters to be copied.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="destination"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="sourceIndex"/>, <paramref name="destinationIndex"/> or <paramref name="count"/> is less than zero.
+        /// -or- <paramref name="sourceIndex"/> is greater than the length of this instance.</exception>
+        /// <exception cref="ArgumentException"><paramref name="sourceIndex"/>+<paramref name="count"/> is greater than the length of this instance.
+        /// -or- <paramref name="destinationIndex"/>+<paramref name="count"/> is greater than the length of <paramref name="destination"/>.</exception>
         public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
         {
             internalBuilder.CopyTo(sourceIndex, destination, destinationIndex, count);
         }
 
+        /// <summary>
+        /// Ensures that the capacity of this instance is at least the specified value.
+        /// </summary>
+        /// <param name="capacity">The minimum capacity to ensure.</param>
+        /// <returns>The new capacity of this instance.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero
+        /// -or- Enlarging the value of this instance would exceed <paramref name="capacity"/>.</exception>
         public int EnsureCapacity(int capacity)
             => internalBuilder.EnsureCapacity(capacity);
 
@@ -821,17 +911,34 @@ namespace LibProtection.Injections
         #endregion Insert
 
         #region Remove
+        /// <summary>
+        /// Removes the specified range of characters from this instance.
+        /// </summary>
+        /// <param name="startIndex">The zero-based position in this instance where removal begins.</param>
+        /// <param name="length">The number of characters to remove.</param>
+        /// <returns>A reference to this instance after the excise operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
+        /// -or- <paramref name="startIndex"/> + <paramref name="length"/> is greater than the length of this instance.</exception>
         public SafeStringBuilder<T> Remove(int startIndex, int length)
         {
             var newRange = new Range(startIndex, startIndex + length);
             taintedRanges.Remove(newRange);
+            internalBuilder.Remove(startIndex, length);
             return this;
 
         }
         #endregion Remove 
 
         #region Replace
-
+        /// <summary>
+        /// Replaces all occurrences of a specified string in this instance with another specified string.
+        /// </summary>
+        /// <param name="oldValue">The string to replace.</param>
+        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <c>null</c>.</param>
+        /// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">THe length of <paramref name="oldValue"/> is zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Replace(string oldValue, string newValue)
         {
             var s = internalBuilder.ToString();
@@ -842,6 +949,11 @@ namespace LibProtection.Injections
 
         #endregion Replace
 
+        /// <summary>
+        /// Converst the value of this instance to a <see cref="String"/>.
+        /// </summary>
+        /// <returns>String whose attacker controlled substrings have been sanitized.</returns>
+        /// <exception cref="AttackDetectedException">An injection attack was detected.</exception>
         public override string ToString()
         {
             var value = internalBuilder.ToString();
@@ -856,6 +968,5 @@ namespace LibProtection.Injections
                 throw new AttackDetectedException();
             }
         }
-
     }
 }
