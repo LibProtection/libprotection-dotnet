@@ -891,8 +891,77 @@ namespace LibProtection.Injections
         public int EnsureCapacity(int capacity)
             => internalBuilder.EnsureCapacity(capacity);
 
-        //TODO: add all insert overloads
         #region Insert
+        /// <summary>
+        /// Inserts one or more copies of a specified string into this instance at the specified character position. 
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The string to insert.</param>
+        /// <param name="count">The numnber of time two insert <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance,
+        /// -or- the current <see cref="Length"/> plus the length of <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref=" OutOfMemoryException">The current length of this instance plus the length of <paramref name="value"/> times <paramref name="count"/>
+        /// exceeds <see cref="MaxCapacity"/>.</exception>
+        public SafeStringBuilder<T> Insert(int index, string value, int count)
+        {
+            internalBuilder.Insert(index, value, count);
+            if (value != null && value.Length != 0)
+            {
+                taintedRanges.SafeInsert(new Range(index, index + value.Length * count));
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Inserts one or more copies of a specified string into this instance at the specified character position. 
+        /// The inserted string is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The string to insert.</param>
+        /// <param name="count">The numnber of time two insert <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance,
+        /// -or- the current <see cref="Length"/> plus the length of <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.</exception>
+        /// <exception cref=" OutOfMemoryException">The current length of this instance plus the length of <paramref name="value"/> times <paramref name="count"/>
+        /// exceeds <see cref="MaxCapacity"/>.</exception>
+        public SafeStringBuilder<T> UncheckedInsert(int index, string value, int count)
+        {
+            internalBuilder.Insert(index, value, count);
+            return this;
+        }
+
+        public SafeStringBuilder<T> Insert(int index, ulong value)
+        {
+            return Insert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> UncheckedInsert(int index, ulong value)
+        {
+            return UncheckedInsert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> Insert(int index, uint value)
+        {
+            return Insert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> UncheckedInsert(int index, uint value)
+        {
+            return UncheckedInsert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> Insert(int index, ushort value)
+        {
+            return Insert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> UncheckedInsert(int index, ushort value)
+        {
+            return UncheckedInsert(index, value.ToString());
+        }
+
         /// <summary>
         /// Inserts a string into this instance at the specified character position. 
         /// The inserted string is considered user controlled for the purpose of attack detection.
@@ -930,6 +999,127 @@ namespace LibProtection.Injections
             }
             return this;
         }
+
+        public SafeStringBuilder<T> Insert(int index, float value)
+        {
+            return Insert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> UncheckedInsert(int index, float value)
+        {
+            return UncheckedInsert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> Insert(int index, char[] value, int startIndex, int charCount)
+        {
+            return Insert(index, new string(value, startIndex, charCount));
+        }
+
+        public SafeStringBuilder<T> UncheckedInsert(int index, char[] value, int startIndex, int charCount)
+        {
+            return UncheckedInsert(index, new string(value, startIndex, charCount));
+        }
+
+        public SafeStringBuilder<T> Insert(int index, sbyte value)
+        {
+            return Insert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> UncheckedInsert(int index, sbyte value)
+        {
+            return UncheckedInsert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> Insert(int index, short value)
+        {
+            return Insert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> UncheckedInsert(int index, short value)
+        {
+            return UncheckedInsert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> Insert(int index, long value)
+        {
+            return Insert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> UncheckedInsert(int index, long value)
+        {
+            return UncheckedInsert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> Insert(int index, int value)
+        {
+            return Insert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> UncheckedInsert(int index, int value)
+        {
+            return UncheckedInsert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> Insert(int index, double value)
+        {
+            return Insert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> UncheckedInsert(int index, double value)
+        {
+            return UncheckedInsert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> Insert(int index, decimal value)
+        {
+            return Insert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> UncheckedInsert(int index, decimal value)
+        {
+            return UncheckedInsert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> Insert(int index, char[] value)
+        {
+            return Insert(index, new string(value));
+        }
+
+        public SafeStringBuilder<T> UncheckedInsert(int index, char[] value)
+        {
+            return UncheckedInsert(index, new string(value));
+        }
+
+        public SafeStringBuilder<T> Insert(int index, byte value)
+        {
+            return Insert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> UncheckedInsert(int index, byte value)
+        {
+            return UncheckedInsert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> Insert(int index, bool value)
+        {
+            return Insert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> UncheckedInsert(int index, bool value)
+        {
+            return UncheckedInsert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> Insert(int index, object value)
+        {
+            return Insert(index, value.ToString());
+        }
+
+        public SafeStringBuilder<T> UncheckedInsert(int index, object value)
+        {
+            return UncheckedInsert(index, value.ToString());
+        }
+
         #endregion Insert
 
         #region Remove
@@ -958,7 +1148,7 @@ namespace LibProtection.Injections
         /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <c>null</c>.</param>
         /// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">THe length of <paramref name="oldValue"/> is zero.</exception>
+        /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Replace(string oldValue, string newValue)
         {
