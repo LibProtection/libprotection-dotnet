@@ -358,7 +358,7 @@ namespace LibProtection.Injections
             bool TryFindNextRange(out Range rangeToReplace, out Range replacingRange)
             {
                 var oldIndex = index;
-                index = currentString.IndexOf(oldValue, startIndex: index, count);
+                index = currentString.IndexOf(oldValue, startIndex: index, count: count);
                 
                 if (index == -1)
                 {

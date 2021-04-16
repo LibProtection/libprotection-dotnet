@@ -5,12 +5,16 @@ using System.Text;
 namespace LibProtection.Injections
 {
     /// <summary>
+    /// <para> 
     /// LibProtection.Injections counterpart to the <see cref="StringBuilder"/> class. 
-    /// For every method of the original <see cref="StringBuilder"/> class <see cref="SafeStringBuilder"/> offers two methods:
+    /// For every method of the original <see cref="StringBuilder"/> class <see cref="SafeStringBuilder{T}"/> offers two methods:
     /// e.g. <see cref="Append(string)"/> and <see cref="UncheckedAppend(string)"/>.
+    /// </para>
+    /// <para>
     /// Methods without the Unchecked prefix assume that the values passed to them can potentially be controlled an attacker.
     /// On the other hand methods, whose names start with Unchecked, assume that the values passed to them cannot be controlled by an attacker.
     /// When <see cref="ToString"/> is called, <see cref="StringBuilder"/> detects potential injection attacks within user controlled segments.
+    /// </para>
     /// </summary>
     /// <typeparam name="T">Specifies the grammar of the string.</typeparam>
     public class SafeStringBuilder<T> where T : LanguageProvider
@@ -70,12 +74,11 @@ namespace LibProtection.Injections
         { 
             get { return internalBuilder.MaxCapacity; } 
         }
-
         #endregion Properties
 
         #region Constructors
         /// <summary>
-        /// Initializes a new instance of the LibProtection.Injections.SafeStringBuilder class.
+        /// Initializes a new instance of the <see cref="SafeStringBuilder{T}"/> class.
         /// </summary>
         public SafeStringBuilder()
         {
@@ -83,7 +86,7 @@ namespace LibProtection.Injections
         }
 
         /// <summary>
-        /// Initializes a new instance of the LibProtection.Injections.SafeStringBuilder class using the specified capacity.
+        /// Initializes a new instance of the <see cref="SafeStringBuilder{T}"/> class using the specified capacity.
         /// </summary>
         /// <param name="capacity">The suggested starting size of this instance.</param>
         /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="capacity"/>capacity is less than zero.</exception>
@@ -93,10 +96,10 @@ namespace LibProtection.Injections
         }
 
         /// <summary>
-        /// Initializes a new instance of the LibProtection.Injections.SafeStringBuilder class using the specified string.
+        /// Initializes a new instance of the <see cref="SafeStringBuilder{T}"/> class using the specified string.
         /// </summary>
         /// <param name="value">The string used to initialize the value of the instance. If value is <c>null</c>, the 
-        /// new instance will contain the empty string (that is, it contains <c>System.String.Empty</c>).</param>
+        /// new instance will contain the empty string (that is, it contains <see cref="String.Empty"/>).</param>
         /// <param name="isSafe">Whether the <paramref name="value"/> can be controlled by an attacker. <c>false</c> by default, 
         /// meaning <paramref name="value"/> is considered attacker controlled.</param>
         public SafeStringBuilder(string value, bool isSafe = false)
@@ -109,7 +112,7 @@ namespace LibProtection.Injections
         }
 
         /// <summary>
-        /// Initializes a new instance of the LibProtection.Injections.SafeStringBuilder class using the specified capacity and maximum capacity.
+        /// Initializes a new instance of the <see cref="SafeStringBuilder{T}"/> class using the specified capacity and maximum capacity.
         /// </summary>
         /// <param name="capacity">The suggested starting size of this instance.</param>
         /// <param name="maxCapacity">The maximum number of characters the current instance can contain.</param>
@@ -122,10 +125,10 @@ namespace LibProtection.Injections
         }
 
         /// <summary>
-        /// Initializes a new instance of the LibProtection.Injections.SafeStringBuilder class using the specified capacity and maximum capacity.
+        /// Initializes a new instance of the <see cref="SafeStringBuilder{T}"/> class using the specified capacity and maximum capacity.
         /// </summary>
         ///<param name="value">The string used to initialize the value of the instance. If value is null, the 
-        /// new instance will contain the empty string (that is, it contains <c>System.String.Empty</c>).</param>
+        /// new instance will contain the empty string (that is, it contains <see cref="String.Empty"/>).</param>
         /// <param name="capacity">The suggested starting size of this instance.</param>
         /// <param name="isSafe">Whether the <paramref name="value"/> can be controlled by an attacker. <c>false</c> by default, 
         /// meaning <paramref name="value"/> is considered attacker controlled.</param>
@@ -140,10 +143,10 @@ namespace LibProtection.Injections
         }
 
         /// <summary>
-        /// Initializes a new instance of the LibProtection.Injections.SafeStringBuilder class from the specified substring and capacity.
+        /// Initializes a new instance of the <see cref="SafeStringBuilder{T}"/> class from the specified substring and capacity.
         /// </summary>
         /// <param name="value">The string used to initialize the value of the instance. If value is null, the 
-        /// new System.Text.StringBuilder will contain the empty string (that is, it contains System.String.Empty).</param>
+        /// new System.Text.StringBuilder will contain the empty string (that is, it contains <see cref="String.Empty"/>).</param>
         /// <param name="startIndex">The position within <paramref name="value"/> where the substring begins.</param>
         /// <param name="length">The number of characters in the substring.</param>
         /// <param name="capacity">The suggested starting size of this instance.</param>
@@ -853,6 +856,7 @@ namespace LibProtection.Injections
         }
         #endregion AppendLine
 
+        #region Clear
         /// <summary>
         /// Removes all characters from the current instance.
         /// </summary>
@@ -863,7 +867,9 @@ namespace LibProtection.Injections
             internalBuilder.Clear();
             return this;
         }
+        #endregion Clear
 
+        #region CopyTo
         /// <summary>
         /// Copies the characters from a specified segment of this instance to a specified segment of a destination <see cref="Char"/> array.
         /// </summary>
@@ -880,7 +886,9 @@ namespace LibProtection.Injections
         {
             internalBuilder.CopyTo(sourceIndex, destination, destinationIndex, count);
         }
+        #endregion CopyTo
 
+        #region EnsureCapacity
         /// <summary>
         /// Ensures that the capacity of this instance is at least the specified value.
         /// </summary>
@@ -890,6 +898,7 @@ namespace LibProtection.Injections
         /// -or- Enlarging the value of this instance would exceed <paramref name="capacity"/>.</exception>
         public int EnsureCapacity(int capacity)
             => internalBuilder.EnsureCapacity(capacity);
+        #endregion EnsureCapacity
 
         #region Insert
         /// <summary>
@@ -1213,6 +1222,7 @@ namespace LibProtection.Injections
 
         #endregion Replace
 
+        #region ToString
         /// <summary>
         /// Converts the value of this instance to a <see cref="String"/>.
         /// </summary>
@@ -1232,5 +1242,6 @@ namespace LibProtection.Injections
                 throw new AttackDetectedException();
             }
         }
+        #endregion ToString
     }
 }
