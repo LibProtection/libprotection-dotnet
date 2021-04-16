@@ -5,9 +5,9 @@ using System.Text;
 
 namespace LibProtection.Injections
 {
-    internal class SortedRangesList : IEnumerable<Range>
+    internal partial class SortedRangesList : IEnumerable<Range>
     {
-        class Item
+        internal class Item
         {
             public Range Range;
             public Item Prev;
@@ -33,8 +33,8 @@ namespace LibProtection.Injections
             }
         }
 
-        Item Head;
-        Item Tail;
+        internal Item Head;
+        internal Item Tail;
 
         private void AddBefore(Item item, Range newRange)
         {
@@ -225,6 +225,28 @@ namespace LibProtection.Injections
             }
         }
 
+        internal void RemoveItem(Item item)
+        {
+            var prevItem = item.Prev;
+            var nextItem = item.Next;
+            if (prevItem != null)
+            {
+                prevItem.Next = nextItem;
+            }
+            else
+            {
+                Head = nextItem;
+            }
+            if (nextItem != null)
+            {
+                nextItem.Prev = prevItem;
+            }
+            else
+            {
+                Tail = prevItem;
+            }
+        }
+
         public void Remove(Range range)
         {
             if (range.Length == 0) return;
@@ -245,24 +267,7 @@ namespace LibProtection.Injections
 
                     if (currentItem.Range.Length == 0)
                     {
-                        var prevItem = currentItem.Prev;
-                        var nextItem = currentItem.Next;
-                        if (prevItem != null)
-                        {
-                            prevItem.Next = nextItem;
-                        }
-                        else
-                        {
-                            Head = nextItem;
-                        }
-                        if (nextItem != null)
-                        {
-                            nextItem.Prev = prevItem;
-                        }
-                        else
-                        {
-                            Tail = prevItem;
-                        }
+                        RemoveItem(currentItem);
                     }
 
                     if (split)
@@ -372,7 +377,6 @@ namespace LibProtection.Injections
                 yield return currentItem.Range;
                 currentItem = currentItem.Next;
             }
-
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -384,184 +388,7 @@ namespace LibProtection.Injections
 
         internal void Replace(string currentString, string oldValue, string newValue, int startIndex, int count)
         {
-            int index = startIndex;
-            var offsetStep = newValue.Length - oldValue.Length;
-            var offsetValue = 0;
-
-            bool TryFindNextRange(out Range rangeToReplace, out Range replacingRange)
-            {
-                var oldIndex = index;
-                index = currentString.IndexOf(oldValue, startIndex: index, count: count);
-                
-                if (index == -1)
-                {
-                    rangeToReplace = new Range();
-                    replacingRange = new Range();
-                    return false;
-                }
-
-                rangeToReplace = new Range(index, index + oldValue.Length);
-                replacingRange = new Range(index, index + newValue.Length);
-                index += oldValue.Length;
-                count -= index - oldIndex;
-                return true;
-            }
-
-            var currentItem = Head;
-            Item firstItem = null;
-
-            bool betweenRR = true;
-            bool nextRRExists;
-            Range rangeToBeReplaced;
-            Range newRange;
-
-            //Name change pending
-            void DoMagick()
-            {
-                //At this point firstItem.Range contains convex hull of all ranges touching rangeToBeReplaced
-                //So all we need to do is to calculate new bounds for it.
-                
-                var range = firstItem.Range;
-                var offset = newRange.Length - rangeToBeReplaced.Length;
-                //LowerBound is simple
-                var newLowerBounnd = Math.Min(range.LowerBound, rangeToBeReplaced.LowerBound); 
-                int newUpperBound;
-                if (range.UpperBound < rangeToBeReplaced.UpperBound)
-                {
-                    if (offset > 0)
-                    {
-                        newUpperBound = rangeToBeReplaced.UpperBound + offset;
-                    }
-                    else
-                    {
-                        newUpperBound = range.UpperBound + offset;
-                    }
-                }
-                else
-                {
-                    newUpperBound = range.UpperBound + offset;
-                }
-
-                firstItem.Range = new Range(newLowerBounnd, newUpperBound);
-                //Offset based on the previously replaced ranges
-                firstItem.Offset(offsetValue);
-
-                //If range collapsed after replacement, remove it from the list
-                if (firstItem.Range.Length == 0)
-                {
-                    var prevItem = firstItem.Prev;
-                    var nextItem = firstItem.Next;
-                    if (prevItem != null)
-                    {
-                        prevItem.Next = nextItem;
-                    }
-                    else
-                    {
-                        Head = nextItem;
-                    }
-                    if (nextItem != null)
-                    {
-                        nextItem.Prev = prevItem;
-                    }
-                    else
-                    {
-                        Tail = prevItem;
-                    }
-                }
-                offsetValue += offsetStep;
-            }
-
-            nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
-
-            while (currentItem != null)
-            {
-                if (nextRRExists) //There is another range to be replaced
-                {
-                    if (betweenRR) //We haven't reached it yet
-                    {
-                        if (!currentItem.Range.Touches(rangeToBeReplaced)) //We still haven't reached it
-                        {
-                            //if we stepped over rangeToBeReplaced completly
-                            if (currentItem.Range.LowerBound >= rangeToBeReplaced.UpperBound)
-                            {
-                                AddBefore(currentItem, newRange.Offset(offsetValue));
-                                offsetValue += offsetStep;
-                                nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
-                            }
-                            currentItem.Offset(offsetValue);
-                        }
-                        else //We did reach it
-                        {
-                            firstItem = currentItem;
-                            betweenRR = false;
-                        }
-
-                        currentItem = currentItem.Next;
-                    }
-                    else //We previously found a range that touches rangeToBeReplaced
-                    {
-                        if (currentItem.Range.Touches(rangeToBeReplaced)) //still touching
-                        {
-                            firstItem.Range = currentItem.Range.ConvexHull(firstItem.Range);
-                            firstItem.Next = currentItem.Next;
-                            if (currentItem.Next != null)
-                            {
-                                currentItem.Next.Prev = firstItem;
-                            }
-                            else
-                            {
-                                Tail = firstItem;
-                            }
-                            currentItem = currentItem.Next;
-                        }
-                        else //current range no longer touches rangeToBeReplaced
-                        {
-                            betweenRR = true;
-
-                            DoMagick();
-
-                            //Check if we replaced the space between two ranges
-                            if (firstItem.Prev != null && firstItem.Range.Touches(firstItem.Prev.Range))
-                            {
-                                var prevItem = firstItem.Prev;
-                                prevItem.Range = prevItem.Range.ConvexHull(firstItem.Range);
-                                prevItem.Next = firstItem.Next;
-                                if (prevItem.Next != null)
-                                {
-                                    prevItem.Next.Prev = prevItem;
-                                }
-                                else
-                                {
-                                    Tail = prevItem;
-                                }
-                            }
-
-                            nextRRExists = TryFindNextRange(out rangeToBeReplaced, out newRange);
-                        }
-                    }
-                }
-                else //After processing all rangesToReplace, we only need to offset the of the ranges
-                {
-                    currentItem.Offset(offsetValue);
-                    currentItem = currentItem.Next;
-                }
-
-            }
-
-            if (!betweenRR && firstItem != null)
-            {
-                DoMagick();
-                nextRRExists = TryFindNextRange(out _, out newRange);
-            }
-
-            while (nextRRExists && newRange.Length != 0)
-            {
-                AddLast(newRange.Offset(offsetValue));
-                offsetValue += offsetStep;
-                nextRRExists = TryFindNextRange(out _, out newRange);
-            }
-
+            new Replacer(currentString, this).Replace(oldValue, newValue, startIndex, count);
         }
-
     }
 }
