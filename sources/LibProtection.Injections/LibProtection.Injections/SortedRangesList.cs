@@ -192,6 +192,39 @@ namespace LibProtection.Injections
             }
         }
 
+        public void CutOff(int value)
+        {
+            var currentItem = Head;
+
+            while (currentItem != null)
+            {
+                if (currentItem.Range.UpperBound > value)
+                {
+                    currentItem.Range = new Range(currentItem.Range.LowerBound, value);
+
+                    if (currentItem.Range.Length == 0)
+                    {
+                        if (currentItem.Prev != null)
+                        {
+                            currentItem.Prev.Next = null;
+                            Tail = currentItem.Prev;
+                        }
+                        else
+                        {
+                            Tail = null;
+                            Head = null;
+                        }
+                    }
+                    else
+                    {
+                        currentItem.Next = null;
+                        Tail = currentItem;
+                    }
+                }
+                currentItem = currentItem.Next;
+            }
+        }
+
         public void Remove(Range range)
         {
             if (range.Length == 0) return;

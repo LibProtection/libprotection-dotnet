@@ -47,6 +47,17 @@ namespace LibProtection.Injections.Tests
         }
 
         [Test]
+        public void TestLength()
+        {
+            var sb = new SafeStringBuilder<Html>();
+            sb.UncheckedAppend("<a href=");
+            sb.AppendLine("</br>");
+            sb.UncheckedAppend("/>");
+            sb.Length = 8;
+            sb.ToString();
+        }
+
+        [Test]
         public void TestInsert()
         {
             var sb = new SafeStringBuilder<Html>();

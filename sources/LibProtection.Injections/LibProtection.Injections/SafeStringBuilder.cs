@@ -63,7 +63,11 @@ namespace LibProtection.Injections
         public int Length
         {
             get { return internalBuilder.Length; }
-            //TODO: add set 
+            set 
+            { 
+                internalBuilder.Length = value;
+                taintedRanges.CutOff(value);
+            }
         }
 
         /// <summary>
