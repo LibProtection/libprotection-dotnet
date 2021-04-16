@@ -945,31 +945,85 @@ namespace LibProtection.Injections
             return this;
         }
 
+        /// <summary>
+        /// Inserts the string representation of a 64-bit unsigned integer into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, ulong value)
         {
             return Insert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a 64-bit unsigned integer into this instance at the specified character position.
+        /// The inserted string is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, ulong value)
         {
             return UncheckedInsert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a 32-bit unsigned integer into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, uint value)
         {
             return Insert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a 32-bit unsigned integer into this instance at the specified character position.
+        /// The inserted string is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, uint value)
         {
             return UncheckedInsert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a 16-bit unsigned integer into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, ushort value)
         {
             return Insert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a 16-bit unsigned integer into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, ushort value)
         {
             return UncheckedInsert(index, value.ToString());
@@ -1013,121 +1067,349 @@ namespace LibProtection.Injections
             return this;
         }
 
+        /// <summary>
+        /// Inserts the string representation of a single-precision floating point number into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, float value)
         {
             return Insert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a single-precision floating point number into this instance at the specified character position.
+        /// The inserted string is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, float value)
         {
             return UncheckedInsert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified subarray of Unicode characters to this instance at the specified character position. 
+        /// Inserted subarray is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="=index">The position in this instance where insertion begins.</param>
+        /// <param name="value">A character array.</param>
+        /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
+        /// <param name="charCount">The number of characters to append.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, 
+        /// and <paramref name="startIndex"/> and <paramref name="charCount"/> are not zero</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/>, <paramref name="startIndex"/> or <paramref name="charCount"/> is less than zero. 
+        /// -or- <paramref name="startIndex"/> is greater than the length of this instance.
+        /// -or- <paramref name="startIndex"/>+<paramref name="charCount"/> is not a position within <paramref name="value"/>. 
+        /// -or- Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, char[] value, int startIndex, int charCount)
         {
             return Insert(index, new string(value, startIndex, charCount));
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified subarray of Unicode characters to this instance at the specified character position. 
+        /// Inserted subarray is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="=index">The position in this instance where insertion begins.</param>
+        /// <param name="value">A character array.</param>
+        /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
+        /// <param name="charCount">The number of characters to append.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, 
+        /// and <paramref name="startIndex"/> and <paramref name="charCount"/> are not zero</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/>, <paramref name="startIndex"/> or <paramref name="charCount"/> is less than zero. 
+        /// -or- <paramref name="startIndex"/> is greater than the length of this instance.
+        /// -or- <paramref name="startIndex"/>+<paramref name="charCount"/> is not a position within <paramref name="value"/>. 
+        /// -or- Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, char[] value, int startIndex, int charCount)
         {
             return UncheckedInsert(index, new string(value, startIndex, charCount));
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified 8-bit signed integer into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, sbyte value)
         {
             return Insert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified 8-bit signed integer into this instance at the specified character position.
+        /// The inserted string is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, sbyte value)
         {
             return UncheckedInsert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified 16-bit signed integer into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, short value)
         {
             return Insert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified 16-bit signed integer into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, short value)
         {
             return UncheckedInsert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified 64-bit signed integer into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, long value)
         {
             return Insert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified 64-bit signed integer into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, long value)
         {
             return UncheckedInsert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified 32-bit signed integer into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, int value)
         {
             return Insert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified 32-bit signed integer into this instance at the specified character position.
+        /// The inserted string is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, int value)
         {
             return UncheckedInsert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified double-precision floating-point number into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, double value)
         {
             return Insert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified double-precision floating-point number into this instance at the specified character position.
+        /// The inserted string is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, double value)
         {
             return UncheckedInsert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified decimal number into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, decimal value)
         {
             return Insert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified decimal number into this instance at the specified character position.
+        /// The inserted string is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, decimal value)
         {
             return UncheckedInsert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified array of Unicode characters into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The character array to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, char[] value)
         {
             return Insert(index, new string(value));
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified array of Unicode characters into this instance at the specified character position.
+        /// The inserted string is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The character array to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, char[] value)
         {
             return UncheckedInsert(index, new string(value));
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified 8-bit unsigned integer into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, byte value)
         {
             return Insert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified 8-bit unsigned integer into this instance at the specified character position.
+        /// The inserted string is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, byte value)
         {
             return UncheckedInsert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified Boolean value into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, bool value)
         {
             return Insert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified Boolean value into this instance at the specified character position.
+        /// The inserted string is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, bool value)
         {
             return UncheckedInsert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified object into this instance at the specified character position.
+        /// The inserted string is considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The object to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> Insert(int index, object value)
         {
             return Insert(index, value.ToString());
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified object into this instance at the specified character position.
+        /// The inserted string is NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The object to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the current length of this instance.</exception>
+        /// <exception cref=" OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
         public SafeStringBuilder<T> UncheckedInsert(int index, object value)
         {
             return UncheckedInsert(index, value.ToString());
