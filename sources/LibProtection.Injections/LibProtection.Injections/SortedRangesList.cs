@@ -349,15 +349,17 @@ namespace LibProtection.Injections
             return new List<Range>(this);
         }
 
-        internal void Replace(string currentString, string oldValue, string newValue)
+        internal void Replace(string currentString, string oldValue, string newValue, int startIndex, int count)
         {
-            int index = 0;
+            int index = startIndex;
             var offsetStep = newValue.Length - oldValue.Length;
             var offsetValue = 0;
 
             bool TryFindNextRange(out Range rangeToReplace, out Range replacingRange)
             {
-                index = currentString.IndexOf(oldValue, startIndex: index);
+                var oldIndex = index;
+                index = currentString.IndexOf(oldValue, startIndex: index, count);
+                
                 if (index == -1)
                 {
                     rangeToReplace = new Range();
@@ -368,6 +370,7 @@ namespace LibProtection.Injections
                 rangeToReplace = new Range(index, index + oldValue.Length);
                 replacingRange = new Range(index, index + newValue.Length);
                 index += oldValue.Length;
+                count -= index - oldIndex;
                 return true;
             }
 
