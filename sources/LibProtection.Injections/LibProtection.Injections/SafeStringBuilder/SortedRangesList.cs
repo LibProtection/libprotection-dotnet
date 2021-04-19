@@ -63,6 +63,12 @@ namespace LibProtection.Injections
         {
             if (item != null)
             {
+                if (item.Range.UpperBound == newRange.LowerBound)
+                {
+                    item.Range = new Range(item.Range.LowerBound, newRange.UpperBound);
+                    return;
+                }
+
                 var next = item.Next;
                 var newItem = new Item(newRange, item, next);
                 item.Next = newItem;
@@ -386,9 +392,9 @@ namespace LibProtection.Injections
             return new List<Range>(this);
         }
 
-        internal void Replace(string currentString, string oldValue, string newValue, int startIndex, int count)
+        internal void Replace(string currentString, string oldValue, string newValue, int startIndex, int count, bool unChecked = false)
         {
-            new Replacer(currentString, this).Replace(oldValue, newValue, startIndex, count);
+            new Replacer(currentString, this, unChecked).Replace(oldValue, newValue, startIndex, count);
         }
     }
 }

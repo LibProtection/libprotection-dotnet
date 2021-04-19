@@ -58,6 +58,39 @@ namespace LibProtection.Injections.Tests
         }
 
         [Test]
+        public void TestUncheckedReplace()
+        {
+            var sb = new SafeStringBuilder<Html>();
+            sb.UncheckedAppend("<a href=");
+            sb.Append("<br>");
+            sb.UncheckedAppend(" />");
+            sb.UncheckedReplace("<br> ", "   ");
+            sb.ToString();
+        }
+
+        [Test]
+        public void TestUncheckedReplace2()
+        {
+            var sb = new SafeStringBuilder<Html>();
+            sb.UncheckedAppend("<a href=");
+            sb.Append("<br>foo");
+            sb.UncheckedAppend(" />");
+            sb.UncheckedReplace("foo", "bar");
+            Assert.Throws<AttackDetectedException>(() => sb.ToString());
+        }
+
+        [Test]
+        public void TestUncheckedReplaceSplit()
+        {
+            var sb = new SafeStringBuilder<Html>();
+            sb.UncheckedAppend("<a href=");
+            sb.Append("<brfoooo>");
+            sb.UncheckedAppend(" />");
+            sb.UncheckedReplace("foooo", "");
+            Assert.Throws<AttackDetectedException>(() => sb.ToString());
+        }
+
+        [Test]
         public void TestInsert()
         {
             var sb = new SafeStringBuilder<Html>();
@@ -137,15 +170,15 @@ namespace LibProtection.Injections.Tests
             Assert.Throws<AttackDetectedException>(() => sb.ToString());
         }
 
-        [Test][Ignore("Validate that excpetion is correctly thrown.")]
+        [Test]
         public void TestReplaceThenSafeReplce()
         {
             var sb = new SafeStringBuilder<Html>();
 
             sb.UncheckedAppend("<{0} href='{1}' >Click me!</{0}>");
-            sb.Replace("{0}", "a");
             sb.Replace("{1}", "default.html");
-            Assert.Throws<AttackDetectedException>(() => sb.ToString());
+            sb.UncheckedReplace("{0}", "a");
+            sb.ToString();
         }
 
         [Test]

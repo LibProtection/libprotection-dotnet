@@ -12,6 +12,7 @@ namespace LibProtection.Injections
             private int count;
             private int offsetStep;
             private int offsetValue;
+            private readonly bool unChecked;
             private readonly string currentString;
             private string oldValue;
             private string newValue;
@@ -20,8 +21,9 @@ namespace LibProtection.Injections
             private Item currentItem;
             private Item firstItem;
 
-            public Replacer(string currentString, SortedRangesList list)
+            public Replacer(string currentString, SortedRangesList list, bool unChecked = false)
             {
+                this.unChecked = unChecked;
                 this.currentString = currentString;
                 this.list = list;
             }
@@ -61,7 +63,48 @@ namespace LibProtection.Injections
                 return true;
             }
 
-            void PerformReplacment()
+            void PerformUncheckedReplacement()
+            {
+                var range = firstItem.Range;
+
+                int newLowerBound;
+                int newUpperBound;
+                bool split = false;
+                Range secondRange = new Range(); ;
+
+                if (range.LowerBound < rangeToBeReplaced.LowerBound) //leftmost part of the range is unaffected by replacement
+                {
+                    newLowerBound = range.LowerBound;
+                    newUpperBound = rangeToBeReplaced.LowerBound;
+                    if (range.UpperBound > rangeToBeReplaced.UpperBound) //rightmost part is not completly replaced
+                    {
+                        split = true;
+                        secondRange = new Range(rangeToBeReplaced.UpperBound, range.UpperBound);
+                    }
+                }
+                else
+                {
+                    if (range.UpperBound > rangeToBeReplaced.UpperBound) //range is not completly replaced
+                    {
+                        newLowerBound = rangeToBeReplaced.UpperBound;
+                        newUpperBound = range.UpperBound;
+                    }
+                    else
+                    {
+                        newLowerBound = range.UpperBound;
+                        newUpperBound = range.UpperBound;
+                    }
+                }
+
+                firstItem.Range = new Range(newLowerBound, newUpperBound);
+
+                if (split)
+                {
+                    list.AddAfter(firstItem, secondRange.Offset(offsetStep));
+                }
+            }
+
+            void PerformСheckedReplacement()
             {
                 //At this point firstItem.Range contains convex hull of all ranges touching rangeToBeReplaced
                 //So all we need to do is to calculate new bounds for it.
@@ -88,25 +131,43 @@ namespace LibProtection.Injections
                 }
 
                 firstItem.Range = new Range(newLowerBounnd, newUpperBound);
+            }
+
+            void PerformReplacement()
+            {
+                if (unChecked)
+                {
+                    PerformUncheckedReplacement();
+                }
+                else
+                {
+                    PerformСheckedReplacement();
+                }
+
                 //Offset based on the previously replaced ranges
                 firstItem.Offset(offsetValue);
 
-                //If range collapsed after replacement, remove it from the list
                 if (firstItem.Range.Length == 0)
                 {
                     list.RemoveItem(firstItem);
                 }
+
                 offsetValue += offsetStep;
             }
 
             bool ShouldSwitchState()
             {
-                return currentItem.Range.Touches(rangeToBeReplaced);
+                return unChecked
+                    ? currentItem.Range.Overlaps(rangeToBeReplaced)
+                    : currentItem.Range.Touches(rangeToBeReplaced);
             }
 
             void AddSkippedRange()
             {
-                list.AddBefore(currentItem, newRange.Offset(offsetValue));
+                if (!unChecked)
+                {
+                    list.AddBefore(currentItem, newRange.Offset(offsetValue));
+                }
             }
 
             private void StartReplacement()
@@ -163,7 +224,7 @@ namespace LibProtection.Injections
                             {
                                 betweenRR = true;
 
-                                PerformReplacment();
+                                PerformReplacement();
 
                                 //Check if we replaced the space between two ranges
                                 if (firstItem.Prev != null && firstItem.Range.Touches(firstItem.Prev.Range))
@@ -194,13 +255,16 @@ namespace LibProtection.Injections
 
                 if (!betweenRR && firstItem != null)
                 {
-                    PerformReplacment();
+                    PerformReplacement();
                     nextRRExists = TryFindNextRange();
                 }
 
                 while (nextRRExists && newRange.Length != 0)
                 {
-                    list.AddLast(newRange.Offset(offsetValue));
+                    if (!unChecked)
+                    {
+                        list.AddLast(newRange.Offset(offsetValue));
+                    }
                     offsetValue += offsetStep;
                     nextRRExists = TryFindNextRange();
                 }

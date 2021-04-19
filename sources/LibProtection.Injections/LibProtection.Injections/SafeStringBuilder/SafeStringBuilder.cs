@@ -853,7 +853,7 @@ namespace LibProtection.Injections
         /// <param name="value">The string to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
-        public SafeStringBuilder<T> UnsafeAppendLine(string value)
+        public SafeStringBuilder<T> UncheckedAppendLine(string value)
         {
             internalBuilder.AppendLine(value);
             return this;
@@ -1438,7 +1438,7 @@ namespace LibProtection.Injections
         #region Replace
         /// <summary>
         /// Replaces all occurrences of a specified string in this instance with another specified string. 
-        /// Replacement segments are contsidered user controlled for the purpose of attack detection.
+        /// Replacement segments are considered user controlled for the purpose of attack detection.
         /// </summary>
         /// <param name="oldValue">The string to replace.</param>
         /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <c>null</c>.</param>
@@ -1455,8 +1455,26 @@ namespace LibProtection.Injections
         }
 
         /// <summary>
+        /// Replaces all occurrences of a specified string in this instance with another specified string. 
+        /// Replacement segments are NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="oldValue">The string to replace.</param>
+        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <c>null</c>.</param>
+        /// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
+        public SafeStringBuilder<T> UncheckedReplace(string oldValue, string newValue)
+        {
+            var str = internalBuilder.ToString();
+            internalBuilder.Replace(oldValue, newValue);
+            taintedRanges.Replace(str, oldValue, newValue, 0, str.Length, true);
+            return this;
+        }
+
+        /// <summary>
         /// Replaces, within a substring of this instance, all occurrences of a specified string with another specified string.
-        /// Replacement segments are contsidered user controlled for the purpose of attack detection.
+        /// Replacement segments are considered user controlled for the purpose of attack detection.
         /// </summary>
         /// <param name="oldValue">The string to replace.</param>
         /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <c>null</c>.</param>
@@ -1478,8 +1496,31 @@ namespace LibProtection.Injections
         }
 
         /// <summary>
+        /// Replaces, within a substring of this instance, all occurrences of a specified string with another specified string.
+        /// Replacement segments are NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="oldValue">The string to replace.</param>
+        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <c>null</c>.</param>
+        /// <param name="startIndex">The position in this instance where the substring begins.</param>
+        /// <param name="count">The length of the substring.</param>
+        /// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/> in the range 
+        /// from <paramref name="startIndex"/> to <paramref name="startIndex"/> + <paramref name="count"/> - 1.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// -or- <paramref name="startIndex"/>+<paramref name="count"/> is greater than <see cref="Length"/> of this instance.
+        /// -or- Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
+        public SafeStringBuilder<T> UncheckedReplace(string oldValue, string newValue, int startIndex, int count)
+        {
+            var str = internalBuilder.ToString();
+            internalBuilder.Replace(oldValue, newValue);
+            taintedRanges.Replace(str, oldValue, newValue, startIndex, count, unChecked: true);
+            return this;
+        }
+
+        /// <summary>
         /// Replaces, within a substring of this instance, all occurrences of a specified character with another specified character.
-        /// Replacement characters are contsidered user controlled for the purpose of attack detection.
+        /// Replacement characters are considered user controlled for the purpose of attack detection.
         /// </summary>
         /// <param name="oldChar">The character to replace.</param>
         /// <param name="newChar">The characherthat replaces <paramref name="oldChar"/>, or <c>null</c>.</param>
@@ -1495,8 +1536,25 @@ namespace LibProtection.Injections
         }
 
         /// <summary>
+        /// Replaces, within a substring of this instance, all occurrences of a specified character with another specified character.
+        /// Replacement characters are NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="oldChar">The character to replace.</param>
+        /// <param name="newChar">The characherthat replaces <paramref name="oldChar"/>, or <c>null</c>.</param>
+        /// <param name="startIndex">The position in this instance where the substring begins.</param>
+        /// <param name="count">The length of the substring.</param>
+        /// <returns>A reference to this instance with all instances of <paramref name="oldChar"/> replaced by <paramref name="newChar"/> in the range 
+        /// from <paramref name="startIndex"/> to <paramref name="startIndex"/> + <paramref name="count"/> - 1.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// -or- <paramref name="startIndex"/>+<paramref name="count"/> is greater than <see cref="Length"/> of this instance.</exception>
+        public SafeStringBuilder<T> UncheckedReplace(char oldChar, char newChar, int startIndex, int count)
+        {
+            return UncheckedReplace(oldChar.ToString(), newChar.ToString(), startIndex, count);
+        }
+
+        /// <summary>
         /// Replaces all occurrences of a specified character in this instance with another specified character.
-        /// Replacement characters are contsidered user controlled for the purpose of attack detection.
+        /// Replacement characters are considered user controlled for the purpose of attack detection.
         /// </summary>
         /// <param name="oldChar">The character to replace.</param>
         /// <param name="newChar">The characherthat replaces <paramref name="oldChar"/>, or <c>null</c>.</param>
@@ -1504,6 +1562,18 @@ namespace LibProtection.Injections
         public SafeStringBuilder<T> Replace(char oldChar, char newChar)
         {
             return Replace(oldChar.ToString(), newChar.ToString());
+        }
+
+        /// <summary>
+        /// Replaces all occurrences of a specified character in this instance with another specified character.
+        /// Replacement characters are NOT considered user controlled for the purpose of attack detection.
+        /// </summary>
+        /// <param name="oldChar">The character to replace.</param>
+        /// <param name="newChar">The characherthat replaces <paramref name="oldChar"/>, or <c>null</c>.</param>
+        /// <returns>A reference to this instance with <paramref name="oldChar"/> replaced by <paramref name="newChar"/>.</returns>
+        public SafeStringBuilder<T> UncheckedReplace(char oldChar, char newChar)
+        {
+            return UncheckedReplace(oldChar.ToString(), newChar.ToString());
         }
 
         #endregion Replace
