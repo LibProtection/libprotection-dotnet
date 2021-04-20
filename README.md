@@ -57,7 +57,7 @@ Unlike in `SafeString.Format()` method, attack detection is postponed until a st
 
 ## Try it online
 
-A test site that imitates a vulnerable application protected by the library (only SafeString.TryFormat for now) is available [here](http://playground.libprotection.org/).
+A test site that imitates a vulnerable application protected by the library (only [SafeString.TryFormat](https://github.com/LibProtection/libprotection-dotnet/blob/dev/sources/LibProtection.Injections/LibProtection.Injections/SafeString.cs#L24) for now) is available [here](http://playground.libprotection.org/).
 
 ## Additional resources
 
