@@ -28,17 +28,7 @@ artifacts:
   name: binaries
 - path: sources\LibProtection.Injections\LibProtection.Injections\bin\Release\*.nupkg
   name: packages
-deploy:
-- provider: NuGet
-  api_key:
-    secure: FSZNincXxq19Gtq2cMqVlsskS+6YXIYnTnmLHruLZMCOBo4fRF4Hukp3LBFNNrnT
-  artifact: packages
-- provider: GitHub
-  auth_token:
-    secure: bOXMe9NbPkdWiZqbMH90QGWJtBcZCup1YwKJBtl+hQc4udL97QNEB0hgZ1wL+MwO
-  repository: LibProtection/libprotection-dotnet
-  artifact: binaries
-  prerelease: true
+deploy: off
 notifications:
 - provider: Email
   to:
