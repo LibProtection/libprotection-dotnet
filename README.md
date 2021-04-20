@@ -61,6 +61,6 @@ A test site that imitates a vulnerable application protected by the library (onl
 
 ## Additional resources
 
-"LibProtection: Defeating Injections" — webinar talk (Russian): [slides](https://speakerdeck.com/kochetkov/libprotection-pobiezhdaia-iniektsii), [video](https://youtu.be/mvFcpnoUfmM).
+*"LibProtection: Defeating Injections"* — webinar talk (Russian): [slides](https://speakerdeck.com/kochetkov/libprotection-pobiezhdaia-iniektsii), [video](https://youtu.be/mvFcpnoUfmM).
 
-"LibProtection: 6 months later" — meetup talk (Russian): [slides](https://speakerdeck.com/kochetkov/libprotection-6-miesiatsiev-spustia), [video](https://youtu.be/IiHHvE3FdC8?list=PLaKsSq6rTf22r9te6azn43JtMCUlFNtqs).
+*"LibProtection: 6 months later"* — meetup talk (Russian): [slides](https://speakerdeck.com/kochetkov/libprotection-6-miesiatsiev-spustia), [video](https://youtu.be/IiHHvE3FdC8?list=PLaKsSq6rTf22r9te6azn43JtMCUlFNtqs).
