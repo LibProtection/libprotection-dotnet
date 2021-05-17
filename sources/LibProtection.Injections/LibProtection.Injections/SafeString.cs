@@ -26,15 +26,6 @@ namespace LibProtection.Injections
         /// <returns>A copy of <paramref name="format"/> in which the placeholders have been replaced by the sanitized string representation
         /// of the corresponding objects in <paramref name="args"/></returns>
         /// <exception cref="AttackDetectedException">Injection attack is detected.</exception>
-        //public static string Format(string format, params object[] args) 
-        //{
-        //    if (TryFormat(format, out var formatted, args))
-        //    {
-        //        return formatted;
-        //    }
-
-        //    throw new AttackDetectedException();
-        //}
         public static string Format(RawString format, params object[] args)
         {
             if (TryFormat(format.Value, out var formatted, args))
