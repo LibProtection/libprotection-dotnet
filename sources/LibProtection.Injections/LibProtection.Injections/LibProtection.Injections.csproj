@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netcoreapp2.0;net40;net461</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netcoreapp2.0;net461</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\LibProtection.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -21,11 +21,8 @@
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <PackageTags>injections, html, javascript, sql, path, url</PackageTags>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net461' OR '$(TargetFramework)' == 'net40'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
     <Reference Include="System.Web" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net40'">
-    <Compile Remove="SafeString.Formattable.cs" />
   </ItemGroup>
   <ItemGroup>
     <Antlr4 Include="..\..\..\submodules\libprotection-common\grammars\HTMLLexer.g4" Link="Languages\Html\HTMLLexer.g4">
