@@ -69,7 +69,7 @@ namespace LibProtection.Injections.Tests
         }
 
         private delegate bool TryFormatDelegate(string format, out string formatted, params object[] args);
-        private delegate string FormatDelegate(string format, params object[] args);
+        private delegate string FormatDelegate(RawString format, params object[] args);
 
         private static void GetFormatters(Type providerType, out TryFormatDelegate tryFormatDelegate, out FormatDelegate formatDelegate)
         {
@@ -78,7 +78,7 @@ namespace LibProtection.Injections.Tests
             var tryFormatMethod = methods.First(x => x.Name == "TryFormat" && x.GetParameters()[0].ParameterType == typeof(string));
             tryFormatDelegate = (TryFormatDelegate)Delegate.CreateDelegate(typeof(TryFormatDelegate), null, tryFormatMethod);
 
-            var formatMethod = methods.First(x => x.Name == "Format" && x.GetParameters()[0].ParameterType == typeof(string));
+            var formatMethod = methods.First(x => x.Name == "Format" && x.GetParameters()[0].ParameterType == typeof(RawString));
             formatDelegate = (FormatDelegate)Delegate.CreateDelegate(typeof(FormatDelegate), null, formatMethod);
         }
 
