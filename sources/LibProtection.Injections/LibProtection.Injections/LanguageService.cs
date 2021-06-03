@@ -26,6 +26,12 @@ namespace LibProtection.Injections
         public static SanitizeResult TrySanitize(LanguageProvider languageProvider, string text, List<Range> taintedRanges)
         {
             var sanitizedRanges = new List<Range>();
+
+            if (languageProvider.GetType() == typeof(Html))
+            {
+                text = Html.HtmlUnescape(text, ref taintedRanges);
+            }
+
             var tokens = languageProvider.Tokenize(text).ToArray();
             var fragments = new Dictionary<Range, string>();
 
